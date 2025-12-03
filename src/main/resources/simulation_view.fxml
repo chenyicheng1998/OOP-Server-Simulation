@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.simulation.controller.SimulationController"
+            prefHeight="900.0" prefWidth="1600.0"
+            stylesheets="@styles.css">
+
+    <!-- Top: Title and Control Panel -->
+    <top>
+        <VBox spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <!-- Title -->
+            <HBox alignment="CENTER">
+                <Label text="☁️ Cloud Computing Service Queue Simulation" textFill="white">
+                    <font>
+                        <Font name="System Bold" size="24.0"/>
+                    </font>
+                </Label>
+            </HBox>
+
+            <!-- Control Buttons -->
+            <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10;">
+                <Button fx:id="startButton" text="▶️ Start" onAction="#handleStart"
+                        styleClass="control-button" prefWidth="100"/>
+                <Button fx:id="pauseButton" text="⏸ Pause" onAction="#handlePause"
+                        styleClass="control-button" prefWidth="100" disable="true"/>
+                <Button fx:id="resumeButton" text="▶️ Resume" onAction="#handleResume"
+                        styleClass="control-button" prefWidth="100" disable="true"/>
+                <Button fx:id="stopButton" text="⏹ Stop" onAction="#handleStop"
+                        styleClass="control-button" prefWidth="100" disable="true"/>
+                <Button fx:id="resetButton" text="🔄 Reset" onAction="#handleReset"
+                        styleClass="control-button" prefWidth="100"/>
+                <Separator orientation="VERTICAL"/>
+                <Label text="Simulation Time:" textFill="white">
+                    <font><Font size="14.0"/></font>
+                </Label>
+                <Label fx:id="timeLabel" text="0.00s" textFill="#3498db">
+                    <font><Font name="System Bold" size="16.0"/></font>
+                </Label>
+                <Separator orientation="VERTICAL"/>
+                <Label text="Speed:" textFill="white">
+                    <font><Font size="14.0"/></font>
+                </Label>
+                <Slider fx:id="speedSlider" min="0.1" max="10.0" value="1.0"
+                        showTickLabels="true" showTickMarks="true"
+                        prefWidth="200" styleClass="speed-slider"/>
+                <Label fx:id="speedLabel" text="1.0x" textFill="white">
+                    <font><Font size="14.0"/></font>
+                </Label>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Center: Visualization Canvas -->
+    <center>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <Label text="System Visualization" styleClass="section-title">
+                <font><Font name="System Bold" size="16.0"/></font>
+            </Label>
+            <StackPane style="-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 2;">
+                <Canvas fx:id="visualizationCanvas" width="900" height="600"/>
+            </StackPane>
+        </VBox>
+    </center>
+
+    <!-- Right: Statistics Panel -->
+    <right>
+        <VBox spacing="10" style="-fx-padding: 10;" prefWidth="350">
+            <Label text="📊 Real-time Statistics" styleClass="section-title">
+                <font><Font name="System Bold" size="16.0"/></font>
+            </Label>
+
+            <ScrollPane fitToWidth="true" style="-fx-background-color: white;">
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <!-- Overall Statistics -->
+                    <TitledPane text="Overall Statistics" expanded="true" collapsible="false">
+                        <GridPane hgap="10" vgap="8" style="-fx-padding: 10;">
+                            <Label text="Tasks Arrived:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="arrivedTasksLabel" text="0" styleClass="stat-value"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Tasks Completed:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="completedTasksLabel" text="0" styleClass="stat-value"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Avg System Time:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <Label fx:id="avgSystemTimeLabel" text="0.00s" styleClass="stat-value"
+                                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                            <Label text="Throughput:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <Label fx:id="throughputLabel" text="0.00/s" styleClass="stat-value"
+                                   GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        </GridPane>
+                    </TitledPane>
+
+                    <!-- Queue Statistics -->
+                    <TitledPane text="Queue Statistics" expanded="true" collapsible="false">
+                        <VBox spacing="5" style="-fx-padding: 10;">
+                            <Label fx:id="queueStatsLabel" text="" wrapText="true"/>
+                        </VBox>
+                    </TitledPane>
+
+                    <!-- User Type Statistics -->
+                    <TitledPane text="User Type Statistics" expanded="true" collapsible="false">
+                        <VBox spacing="5" style="-fx-padding: 10;">
+                            <Label fx:id="userTypeStatsLabel" text="" wrapText="true"/>
+                        </VBox>
+                    </TitledPane>
+
+                    <!-- Task Type Statistics -->
+                    <TitledPane text="Task Type Statistics" expanded="true" collapsible="false">
+                        <VBox spacing="5" style="-fx-padding: 10;">
+                            <Label fx:id="taskTypeStatsLabel" text="" wrapText="true"/>
+                        </VBox>
+                    </TitledPane>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </right>
+
+    <!-- Bottom: Configuration Panel -->
+    <bottom>
+        <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: #ecf0f1;">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="⚙️ Configuration Parameters" styleClass="section-title">
+                    <font><Font name="System Bold" size="16.0"/></font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="💾 Save Config" onAction="#handleSaveConfig" styleClass="config-button"/>
+                <Button text="📁 Load Config" onAction="#handleLoadConfig" styleClass="config-button"/>
+                <Button text="📊 View History" onAction="#handleViewHistory" styleClass="config-button"/>
+            </HBox>
+
+            <GridPane hgap="15" vgap="10" style="-fx-padding: 10;">
+                <!-- Row 0 -->
+                <Label text="Mean Arrival Interval (s):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="arrivalIntervalField" text="2.0" prefWidth="100"
+                          GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Simulation Time (s):" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                <TextField fx:id="simulationTimeField" text="1000.0" prefWidth="100"
+                          GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                <!-- Row 1 -->
+                <Label text="CPU Nodes:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="cpuNodesField" text="2" prefWidth="100"
+                          GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="GPU Nodes:" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                <TextField fx:id="gpuNodesField" text="1" prefWidth="100"
+                          GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                <!-- Row 2 -->
+                <Label text="CPU Task Probability:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <TextField fx:id="cpuProbabilityField" text="0.7" prefWidth="100"
+                          GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="Database:" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                <HBox spacing="5" GridPane.rowIndex="2" GridPane.columnIndex="3">
+                    <Label fx:id="dbStatusLabel" text="❌ Not Connected" styleClass="db-status"/>
+                    <Button text="Test" onAction="#handleTestDatabase" prefWidth="60"/>
+                </HBox>
+            </GridPane>
+        </VBox>
+    </bottom>
+
+</BorderPane>
+
