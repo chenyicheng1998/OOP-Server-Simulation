@@ -329,16 +329,20 @@ public class SimulationController {
     }
 
     private void updateVisualization() {
-        if (visualizationCanvas == null) return;
+        if (visualizationCanvas == null || engine == null) return;
 
         GraphicsContext gc = visualizationCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, visualizationCanvas.getWidth(), visualizationCanvas.getHeight());
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, visualizationCanvas.getWidth(), visualizationCanvas.getHeight());
 
-        // TODO: Draw service points, queues, tasks in transit
-        drawInitialCanvas();
+        // Draw system with current state
+        drawSystemWithState(gc);
     }
 
     private void drawInitialCanvas() {
+        if (visualizationCanvas == null) return;
+        
         GraphicsContext gc = visualizationCanvas.getGraphicsContext2D();
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, visualizationCanvas.getWidth(), visualizationCanvas.getHeight());
@@ -347,6 +351,113 @@ public class SimulationController {
         gc.setFont(javafx.scene.text.Font.font(16));
         gc.fillText("System Visualization Area", visualizationCanvas.getWidth() / 2 - 90,
                     visualizationCanvas.getHeight() / 2);
+    }
+
+    private void drawSystemWithState(GraphicsContext gc) {
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(2);
+
+        double startX = 50;
+        double startY = 300;
+        double spacing = 100;
+
+        // Draw service points with current state
+        drawServicePoint(gc, startX, startY, "Arrival", Color.LIGHTGREEN, 0, 0);
+        drawArrow(gc, startX + 60, startY, startX + spacing, startY);
+
+        startX += spacing;
+        ServicePoint dataStorage = engine.getDataStorage();
+        drawServicePoint(gc, startX, startY, "Data\nStorage", Color.LIGHTBLUE,
+            dataStorage.getQueueLength(), dataStorage.getBusyServers());
+        drawArrow(gc, startX + 60, startY, startX + spacing, startY);
+
+        startX += spacing;
+        ServicePoint classification = engine.getClassification();
+        drawServicePoint(gc, startX, startY, "Classification", Color.LIGHTYELLOW,
+            classification.getQueueLength(), classification.getBusyServers());
+
+        // CPU and GPU paths
+        double cpuY = startY - 100;
+        double gpuY = startY + 100;
+
+        drawArrow(gc, startX + 30, startY - 30, startX + 30, cpuY + 30);
+        ServicePoint cpuQueue = engine.getCpuQueue();
+        drawServicePoint(gc, startX, cpuY, "CPU\nQueue", Color.ORANGE,
+            cpuQueue.getQueueLength(), 0);
+        drawArrow(gc, startX + 60, cpuY, startX + spacing, cpuY);
+
+        double cpuComputeX = startX + spacing;
+        ServicePoint cpuCompute = engine.getCpuCompute();
+        drawServicePoint(gc, cpuComputeX, cpuY, "CPU\nCompute", Color.CORAL,
+            0, cpuCompute.getBusyServers());
+
+        drawArrow(gc, startX + 30, startY + 30, startX + 30, gpuY - 30);
+        ServicePoint gpuQueue = engine.getGpuQueue();
+        drawServicePoint(gc, startX, gpuY, "GPU\nQueue", Color.PINK,
+            gpuQueue.getQueueLength(), 0);
+        drawArrow(gc, startX + 60, gpuY, startX + spacing, gpuY);
+
+        double gpuComputeX = startX + spacing;
+        ServicePoint gpuCompute = engine.getGpuCompute();
+        drawServicePoint(gc, gpuComputeX, gpuY, "GPU\nCompute", Color.PLUM,
+            0, gpuCompute.getBusyServers());
+
+        double resultX = cpuComputeX + spacing;
+        drawArrow(gc, cpuComputeX + 60, cpuY, resultX, startY);
+        drawArrow(gc, gpuComputeX + 60, gpuY, resultX, startY);
+
+        ServicePoint resultStorage = engine.getResultStorage();
+        drawServicePoint(gc, resultX, startY, "Result\nStorage", Color.LIGHTGREEN,
+            resultStorage.getQueueLength(), resultStorage.getBusyServers());
+        drawArrow(gc, resultX + 60, startY, resultX + 80, startY);
+
+        gc.fillText("Exit", resultX + 85, startY + 5);
+    }
+
+    private void drawServicePoint(GraphicsContext gc, double x, double y, String name, 
+                                   Color color, int queueLength, int busyServers) {
+        // Draw box
+        gc.setFill(color);
+        gc.fillRect(x, y - 30, 60, 60);
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(x, y - 30, 60, 60);
+
+        // Draw name
+        gc.setFill(Color.BLACK);
+        gc.setFont(javafx.scene.text.Font.font("Arial", 10));
+        String[] lines = name.split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            gc.fillText(lines[i], x + 5, y - 10 + i * 12);
+        }
+
+        // Draw queue length if > 0
+        if (queueLength > 0) {
+            gc.setFill(Color.RED);
+            gc.fillText("Q:" + queueLength, x + 5, y + 20);
+        }
+
+        // Draw busy servers if > 0
+        if (busyServers > 0) {
+            gc.setFill(Color.BLUE);
+            gc.fillText("B:" + busyServers, x + 35, y + 20);
+        }
+    }
+
+    private void drawArrow(GraphicsContext gc, double x1, double y1, double x2, double y2) {
+        gc.strokeLine(x1, y1, x2, y2);
+
+        // Draw arrowhead
+        double angle = Math.atan2(y2 - y1, x2 - x1);
+        double arrowLength = 10;
+        double arrowAngle = Math.PI / 6;
+
+        double x3 = x2 - arrowLength * Math.cos(angle - arrowAngle);
+        double y3 = y2 - arrowLength * Math.sin(angle - arrowAngle);
+        double x4 = x2 - arrowLength * Math.cos(angle + arrowAngle);
+        double y4 = y2 - arrowLength * Math.sin(angle + arrowAngle);
+
+        gc.strokeLine(x2, y2, x3, y3);
+        gc.strokeLine(x2, y2, x4, y4);
     }
 
     private void updateButtonStates(boolean running) {
