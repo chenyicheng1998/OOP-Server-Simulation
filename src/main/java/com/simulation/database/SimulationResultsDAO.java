@@ -7,6 +7,7 @@ import com.simulation.model.UserType;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -218,17 +219,18 @@ public class SimulationResultsDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                runs.add(Map.of(
-                    "runId", rs.getInt("run_id"),
-                    "runName", rs.getString("run_name"),
-                    "startTime", rs.getTimestamp("start_time"),
-                    "endTime", rs.getTimestamp("end_time"),
-                    "totalTasks", rs.getInt("total_tasks_completed"),
-                    "avgSystemTime", rs.getDouble("avg_system_time"),
-                    "throughput", rs.getDouble("throughput"),
-                    "status", rs.getString("status")
-                ));
+                Map<String,Object> run = new java.util.HashMap<>();
+                run.put("runId", rs.getInt("run_id"));
+                run.put("runName", rs.getString("run_name"));
+                run.put("startTime", rs.getTimestamp("start_time"));
+                run.put("endTime", rs.getTimestamp("end_time"));
+                run.put("totalTasks", rs.getInt("total_tasks_completed"));
+                run.put("avgSystemTime", rs.getDouble("avg_system_time"));
+                run.put("throughput", rs.getDouble("throughput"));
+                run.put("status", rs.getString("status"));
+                runs.add(run);
             }
+
         }
         return runs;
     }

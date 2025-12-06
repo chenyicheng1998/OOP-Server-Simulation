@@ -5,6 +5,8 @@ import com.simulation.database.SimulationConfigDAO;
 import com.simulation.database.SimulationResultsDAO;
 import com.simulation.model.*;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -13,8 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * FXML Controller that mediates between View and Model
@@ -47,6 +48,18 @@ public class SimulationController {
 
     @FXML private Slider speedSlider;
     @FXML private Canvas visualizationCanvas;
+
+    @FXML private TableView<Map<String,Object>> historyTable;
+    @FXML private TableColumn<Map<String,Object>, String> runIdColumn;
+    @FXML private TableColumn<Map<String,Object>, String> runNameColumn;
+    @FXML private TableColumn<Map<String,Object>, String> startTimeColumn;
+    @FXML private TableColumn<Map<String,Object>, String> endTimeColumn;
+    @FXML private TableColumn<Map<String,Object>, String> completedTasksColumn;
+    @FXML private TableColumn<Map<String,Object>, String> avgSystemTimeColumn;
+    @FXML private TableColumn<Map<String,Object>, String> throughputColumn;
+    @FXML private TableColumn<Map<String,Object>, String> statusColumn;
+
+
 
     // Model components
     private SimulationEngine engine;
@@ -87,9 +100,50 @@ public class SimulationController {
         if (visualizationCanvas != null) {
             drawInitialCanvas();
         }
+        // === Table column bindings ===
+        runIdColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(String.valueOf(cell.getValue().get("runId")))
+        );
+
+        runNameColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(String.valueOf(cell.getValue().get("runName")))
+        );
+
+        startTimeColumn.setCellValueFactory(cell -> {
+            Object ts = cell.getValue().get("startTime");
+            return new SimpleStringProperty(ts == null ? "" : ts.toString());
+        });
+
+        endTimeColumn.setCellValueFactory(cell -> {
+            Object ts = cell.getValue().get("endTime");
+            return new SimpleStringProperty(ts == null ? "" : ts.toString());
+        });
+
+        completedTasksColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(String.valueOf(cell.getValue().get("totalTasks")))
+        );
+
+        avgSystemTimeColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(
+                        String.format("%.3f",
+                                (double) cell.getValue().get("avgSystemTime"))
+                )
+        );
+
+        throughputColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(
+                        String.format("%.3f",
+                                (double) cell.getValue().get("throughput"))
+                )
+        );
+
+        statusColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(String.valueOf(cell.getValue().get("status")))
+        );
     }
 
-    // ========== FXML Event Handlers ==========
+
+        // ========== FXML Event Handlers ==========
 
     @FXML
     private void handleStart() {
@@ -192,9 +246,19 @@ public class SimulationController {
 
     @FXML
     private void handleViewHistory() {
-        // TODO: Implement history viewer window
-        showInfo("Under Development", "History viewer feature coming soon");
+        System.out.println("View History clicked!");
+        try {
+            List<Map<String,Object>> runs = resultsDAO.getAllSimulationRuns();
+            System.out.println("Runs fetched: " + runs.size());
+            for (Map<String,Object> run : runs) {
+                System.out.println(run);
+            }
+            historyTable.setItems(javafx.collections.FXCollections.observableArrayList(runs));
+        } catch (SQLException e) {
+            showError("Database Error", "Failed to load history: " + e.getMessage());
+        }
     }
+
 
     @FXML
     private void handleTestDatabase() {
@@ -342,7 +406,7 @@ public class SimulationController {
 
     private void drawInitialCanvas() {
         if (visualizationCanvas == null) return;
-        
+
         GraphicsContext gc = visualizationCanvas.getGraphicsContext2D();
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, visualizationCanvas.getWidth(), visualizationCanvas.getHeight());
@@ -414,7 +478,7 @@ public class SimulationController {
         gc.fillText("Exit", resultX + 85, startY + 5);
     }
 
-    private void drawServicePoint(GraphicsContext gc, double x, double y, String name, 
+    private void drawServicePoint(GraphicsContext gc, double x, double y, String name,
                                    Color color, int queueLength, int busyServers) {
         // Draw box
         gc.setFill(color);

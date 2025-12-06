@@ -167,6 +167,29 @@
                     <Button text="Test" onAction="#handleTestDatabase" prefWidth="60"/>
                 </HBox>
             </GridPane>
+
+            <!-- Add Simulation History table -->
+            <TitledPane text="Simulation History" expanded="true" collapsible="true">
+                <VBox spacing="5" style="-fx-padding: 10;">
+                    <TableView fx:id="historyTable" prefHeight="200" prefWidth="600">
+                        <columns>
+                            <TableColumn fx:id="runIdColumn" text="Run ID" prefWidth="80"/>
+                            <TableColumn fx:id="runNameColumn" text="Run Name" prefWidth="200"/>
+                            <TableColumn fx:id="startTimeColumn" text="Start Time" prefWidth="150"/>
+                            <TableColumn fx:id="endTimeColumn" text="End Time" prefWidth="150"/>
+                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+                            <TableColumn fx:id="completedTasksColumn" text="Completed Tasks" prefWidth="120"/>
+                            <TableColumn fx:id="avgSystemTimeColumn" text="Avg System Time" prefWidth="120"/>
+                            <TableColumn fx:id="throughputColumn" text="Throughput" prefWidth="120"/>
+
+                        </columns>
+                    </TableView>
+
+
+
+                </VBox>
+            </TitledPane>
+
         </VBox>
     </bottom>
 
