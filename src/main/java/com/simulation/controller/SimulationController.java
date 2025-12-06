@@ -71,6 +71,10 @@ public class SimulationController {
     private final SimulationResultsDAO resultsDAO;
     private Integer currentRunId;
 
+    // UI update throttling
+    private long lastUpdateTime = 0;
+    private static final long UPDATE_INTERVAL_MS = 100; // Update UI every 100ms
+
     public SimulationController() {
         this.config = new SimulationConfig();
         this.dbManager = DatabaseManager.getInstance();
@@ -96,9 +100,15 @@ public class SimulationController {
         // Setup speed slider listener
         if (speedSlider != null) {
             speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-                speedLabel.setText(String.format("%.1fx", newVal.doubleValue()));
+                double speed = newVal.doubleValue();
+                // Format speed display: show 1 decimal for < 10x, integer for >= 10x
+                if (speed >= 10.0) {
+                    speedLabel.setText(String.format("%.0fx", speed));
+                } else {
+                    speedLabel.setText(String.format("%.1fx", speed));
+                }
                 if (engine != null) {
-                    engine.setSpeed(newVal.doubleValue());
+                    engine.setSpeed(speed);
                 }
             });
         }
@@ -205,6 +215,12 @@ public class SimulationController {
     private void handleReset() {
         stopSimulation();
         initializeSimulation();
+
+        // Apply current speed from slider to the reset engine
+        if (engine != null && speedSlider != null) {
+            engine.setSpeed(speedSlider.getValue());
+        }
+
         updateStatistics();
         updateButtonStates(false);
     }
@@ -391,16 +407,24 @@ public class SimulationController {
             engine.setListener(new SimulationEngine.SimulationListener() {
                 @Override
                 public void onTimeUpdate(double time) {
-                    Platform.runLater(() -> {
-                        timeLabel.setText(String.format("%.2fs", time));
-                        updateStatistics();
-                        updateVisualization();
-                    });
+                    // Throttle UI updates to prevent stuttering
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastUpdateTime >= UPDATE_INTERVAL_MS) {
+                        lastUpdateTime = currentTime;
+                        Platform.runLater(() -> {
+                            timeLabel.setText(String.format("%.2fs", time));
+                            updateStatistics();
+                            updateVisualization();
+                        });
+                    }
                 }
 
                 @Override
                 public void onSimulationComplete() {
                     Platform.runLater(() -> {
+                        // Final update to show accurate completion state
+                        updateStatistics();
+                        updateVisualization();
                         updateButtonStates(false);
                         if (currentRunId != null) {
                             saveResultsToDatabase();

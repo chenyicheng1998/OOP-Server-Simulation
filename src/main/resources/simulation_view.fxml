@@ -36,23 +36,20 @@
                         styleClass="control-button" prefWidth="100" disable="true"/>
                 <Button fx:id="resetButton" text="🔄 Reset" onAction="#handleReset"
                         styleClass="control-button" prefWidth="100"/>
-                <Separator orientation="VERTICAL"/>
-                <Label text="Simulation Time:" textFill="white">
-                    <font><Font size="14.0"/></font>
-                </Label>
-                <Label fx:id="timeLabel" text="0.00s" textFill="#3498db">
-                    <font><Font name="System Bold" size="16.0"/></font>
-                </Label>
-                <Separator orientation="VERTICAL"/>
-                <Label text="Speed:" textFill="white">
-                    <font><Font size="14.0"/></font>
-                </Label>
-                <Slider fx:id="speedSlider" min="0.1" max="10.0" value="1.0"
-                        showTickLabels="true" showTickMarks="true"
-                        prefWidth="200" styleClass="speed-slider"/>
-                <Label fx:id="speedLabel" text="1.0x" textFill="white">
-                    <font><Font size="14.0"/></font>
-                </Label>
+                <Region prefWidth="30"/>
+                <VBox alignment="CENTER" spacing="3" style="-fx-background-color: #3498db; -fx-padding: 10; -fx-background-radius: 6; -fx-border-color: #ffffff; -fx-border-width: 2; -fx-border-radius: 6;">
+                    <Label text="⏱ SIMULATION TIME"  style="-fx-font-size: 12px; -fx-font-weight: bold; letter-spacing: 1px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 3, 0, 0, 1); -fx-text-fill: white;"/>
+                    <Label fx:id="timeLabel" text="0.00s" style="-fx-font-weight: bold; -fx-font-size: 26px; -fx-background-color: #2471a3; -fx-padding: 6 18 6 18; -fx-background-radius: 4; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 5, 0, 0, 2); -fx-text-fill: white;"/>                </VBox>
+                <Region prefWidth="30"/>
+                <VBox alignment="CENTER" spacing="5" style="-fx-background-color: #27ae60; -fx-padding: 10; -fx-background-radius: 6; -fx-border-color: #ffffff; -fx-border-width: 2; -fx-border-radius: 6;">
+                    <Label text="🚀 SPEED CONTROL"  style="-fx-font-size: 12px; -fx-font-weight: bold; letter-spacing: 1px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 3, 0, 0, 1); -fx-text-fill: white;"/>
+                    <HBox spacing="10" alignment="CENTER">
+                        <Slider fx:id="speedSlider" min="0.1" max="100.0" value="1.0"
+                                showTickLabels="true" showTickMarks="true"
+                                majorTickUnit="20" minorTickCount="3" snapToTicks="false"
+                                prefWidth="220" styleClass="speed-slider"/>
+                        <Label fx:id="speedLabel" text="1.0x" style="-fx-font-weight: bold; -fx-font-size: 22px; -fx-min-width: 70px; -fx-background-color: #1e8449; -fx-padding: 6 14 6 14; -fx-background-radius: 4; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 5, 0, 0, 2); -fx-alignment: center; -fx-text-fill: white;"/>                    </HBox>
+                </VBox>
             </HBox>
         </VBox>
     </top>

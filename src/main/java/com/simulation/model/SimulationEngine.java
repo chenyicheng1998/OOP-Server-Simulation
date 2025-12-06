@@ -40,7 +40,7 @@ public class SimulationEngine extends Thread {
         this.listener = listener;
     }
     public void setSpeed(double speed) {
-        this.speedMultiplier = Math.max(0.1, Math.min(10.0, speed));
+        this.speedMultiplier = Math.max(0.1, Math.min(100.0, speed));
     }
     public void initialize() {
         clock.reset();
@@ -68,6 +68,8 @@ public class SimulationEngine extends Thread {
     @Override
     public void run() {
         running = true;
+        double previousTime = 0.0;
+
         while (running && eventList.hasEvents() && clock.getTime() <= config.getSimulationTime()) {
             synchronized (pauseLock) {
                 while (paused && running) {
@@ -77,14 +79,27 @@ public class SimulationEngine extends Thread {
             if (!running) break;
             Event event = eventList.getNextEvent();
             if (event != null) {
-                clock.setTime(event.getTime());
-                processEvent(event);
-                if (listener != null) listener.onTimeUpdate(clock.getTime());
-                try {
-                    Thread.sleep((long)(50 / speedMultiplier));
-                } catch (InterruptedException e) {
-                    return;
+                double currentTime = event.getTime();
+                double timeElapsed = currentTime - previousTime;
+
+                // Sleep proportional to simulated time elapsed
+                // At 1x speed: 1 simulated second = 1 real second (1000ms)
+                // At 2x speed: 1 simulated second = 0.5 real seconds (500ms)
+                // At 0.5x speed: 1 simulated second = 2 real seconds (2000ms)
+                if (timeElapsed > 0) {
+                    try {
+                        long sleepTime = (long)(timeElapsed * 1000.0 / speedMultiplier);
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
                 }
+
+                clock.setTime(currentTime);
+                processEvent(event);
+                previousTime = currentTime;
+
+                if (listener != null) listener.onTimeUpdate(clock.getTime());
             }
         }
         running = false;

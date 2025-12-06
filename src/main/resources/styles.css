@@ -54,12 +54,53 @@
 }
 
 /* Speed Slider */
-.speed-slider .thumb {
-    -fx-background-color: #3498db;
+.speed-slider {
+    -fx-padding: 5 0 5 0;
 }
 
 .speed-slider .track {
-    -fx-background-color: #bdc3c7;
+    -fx-background-color: linear-gradient(to right, #27ae60 0%, #f39c12 50%, #e74c3c 100%);
+    -fx-background-radius: 5;
+    -fx-pref-height: 8;
+}
+
+.speed-slider .thumb {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 3);
+    -fx-cursor: hand;
+}
+
+.speed-slider .thumb:hover {
+    -fx-scale-x: 1.15;
+    -fx-scale-y: 1.15;
+    -fx-background-color: #3498db;
+}
+
+.speed-slider .thumb:pressed {
+    -fx-background-color: #2980b9;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+/* Speed slider tick labels - white for consistency and visibility on dark background */
+.speed-slider .axis {
+    -fx-tick-label-fill: white !important;
+    -fx-tick-label-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.speed-slider .axis .axis-tick-mark {
+    -fx-stroke: rgba(255, 255, 255, 0.7);
+    -fx-stroke-width: 1.5;
+}
+
+.speed-slider .axis Text {
+    -fx-fill: white !important;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 2, 0, 0, 1);
 }
 
 /* Statistics Values */
@@ -118,12 +159,20 @@
 }
 
 /* Labels in GridPane */
-.label {
-    -fx-text-fill: #2c3e50;
-}
+/*.label {*/
+/*    -fx-text-fill: #2c3e50;*/
+/*}*/
 
 /* Separator */
 .separator {
-    -fx-background-color: #7f8c8d;
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+.separator:vertical {
+    -fx-pref-width: 1;
+}
+
+.separator:horizontal {
+    -fx-pref-height: 1;
 }
 
