@@ -20,8 +20,11 @@ public class DatabaseManager {
     private DatabaseManager() {
         try {
             initializeDataSource();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to initialize database connection pool", e);
+        } catch (Exception e) {
+            System.err.println("⚠️  Database connection failed: " + e.getMessage());
+            System.err.println("⚠️  The application will continue without database features.");
+            System.err.println("⚠️  Please check your MariaDB server and database.properties configuration.");
+            // Don't throw exception - allow app to continue without database
         }
     }
 
@@ -82,6 +85,9 @@ public class DatabaseManager {
      * @throws SQLException if connection cannot be obtained
      */
     public Connection getConnection() throws SQLException {
+        if (dataSource == null) {
+            throw new SQLException("Database connection pool not initialized");
+        }
         return dataSource.getConnection();
     }
 
@@ -90,6 +96,9 @@ public class DatabaseManager {
      * @return true if connection is successful
      */
     public boolean testConnection() {
+        if (dataSource == null) {
+            return false;
+        }
         try (Connection conn = getConnection()) {
             return conn != null && !conn.isClosed();
         } catch (SQLException e) {

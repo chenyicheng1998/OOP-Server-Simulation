@@ -74,8 +74,18 @@ public class SimulationController {
     public SimulationController() {
         this.config = new SimulationConfig();
         this.dbManager = DatabaseManager.getInstance();
-        this.configDAO = new SimulationConfigDAO();
-        this.resultsDAO = new SimulationResultsDAO();
+
+        // Initialize DAO objects, but they will handle database unavailability internally
+        SimulationConfigDAO tempConfigDAO = null;
+        SimulationResultsDAO tempResultsDAO = null;
+        try {
+            tempConfigDAO = new SimulationConfigDAO();
+            tempResultsDAO = new SimulationResultsDAO();
+        } catch (Exception e) {
+            System.err.println("⚠️  Could not initialize database DAOs: " + e.getMessage());
+        }
+        this.configDAO = tempConfigDAO;
+        this.resultsDAO = tempResultsDAO;
     }
 
     /**
@@ -140,6 +150,9 @@ public class SimulationController {
         statusColumn.setCellValueFactory(cell ->
                 new SimpleStringProperty(String.valueOf(cell.getValue().get("status")))
         );
+
+        // Auto-load history on startup
+        loadHistoryData();
     }
 
 
@@ -244,19 +257,39 @@ public class SimulationController {
         }
     }
 
-    @FXML
-    private void handleViewHistory() {
-        System.out.println("View History clicked!");
+    /**
+     * Load history data from database and display in table
+     */
+    private void loadHistoryData() {
+        if (resultsDAO == null) {
+            System.out.println("⚠️  Database not available - cannot load history");
+            return;
+        }
+
         try {
             List<Map<String,Object>> runs = resultsDAO.getAllSimulationRuns();
-            System.out.println("Runs fetched: " + runs.size());
-            for (Map<String,Object> run : runs) {
-                System.out.println(run);
+            System.out.println("✅ History loaded: " + runs.size() + " simulation runs found");
+
+            if (historyTable != null) {
+                historyTable.setItems(FXCollections.observableArrayList(runs));
+                historyTable.refresh();
+                System.out.println("✅ History table updated in UI");
+            } else {
+                System.err.println("⚠️  History table is null!");
             }
-            historyTable.setItems(javafx.collections.FXCollections.observableArrayList(runs));
         } catch (SQLException e) {
-            showError("Database Error", "Failed to load history: " + e.getMessage());
+            System.err.println("❌ Failed to load history: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error loading history: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void handleViewHistory() {
+        System.out.println("📊 View History button clicked!");
+        loadHistoryData();
     }
 
 
