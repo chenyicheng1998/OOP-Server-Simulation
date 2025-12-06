@@ -173,6 +173,11 @@ public class SimulationController {
         updateConfigFromUI();
         initializeSimulation();
 
+        // Apply current speed from slider to the new engine
+        if (engine != null && speedSlider != null) {
+            engine.setSpeed(speedSlider.getValue());
+        }
+
         // Create database run record
         try {
             currentRunId = resultsDAO.createSimulationRun(null,

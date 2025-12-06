@@ -79,25 +79,44 @@ public class SimulationEngine extends Thread {
             if (!running) break;
             Event event = eventList.getNextEvent();
             if (event != null) {
-                double currentTime = event.getTime();
-                double timeElapsed = currentTime - previousTime;
+                double targetTime = event.getTime();
+                double timeElapsed = targetTime - previousTime;
 
-                // Sleep proportional to simulated time elapsed
+                // Sleep proportional to simulated time elapsed, but break into small chunks
+                // for smooth time display updates
                 // At 1x speed: 1 simulated second = 1 real second (1000ms)
                 // At 2x speed: 1 simulated second = 0.5 real seconds (500ms)
-                // At 0.5x speed: 1 simulated second = 2 real seconds (2000ms)
                 if (timeElapsed > 0) {
-                    try {
-                        long sleepTime = (long)(timeElapsed * 1000.0 / speedMultiplier);
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        return;
+                    // Capture current speed to avoid inconsistency if slider is adjusted during sleep
+                    double currentSpeed = speedMultiplier;
+                    long totalSleepTime = (long)(timeElapsed * 1000.0 / currentSpeed);
+                    long sleepChunk = 50; // Update UI every 50ms for smooth display
+                    long initialSleepTime = totalSleepTime;
+
+                    // Break the sleep into small chunks and update time progressively
+                    while (totalSleepTime > 0 && running && !paused) {
+                        long currentSleep = Math.min(sleepChunk, totalSleepTime);
+                        try {
+                            Thread.sleep(currentSleep);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+
+                        // Update clock progressively for smooth display
+                        // Use initial sleep time to calculate consistent progress
+                        double progress = (double)(initialSleepTime - totalSleepTime + currentSleep) / initialSleepTime;
+                        double intermediateTime = previousTime + (timeElapsed * progress);
+                        clock.setTime(intermediateTime);
+
+                        if (listener != null) listener.onTimeUpdate(clock.getTime());
+
+                        totalSleepTime -= currentSleep;
                     }
                 }
 
-                clock.setTime(currentTime);
+                clock.setTime(targetTime);
                 processEvent(event);
-                previousTime = currentTime;
+                previousTime = targetTime;
 
                 if (listener != null) listener.onTimeUpdate(clock.getTime());
             }
