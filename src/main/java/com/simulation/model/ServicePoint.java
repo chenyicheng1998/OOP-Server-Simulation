@@ -33,7 +33,7 @@ public class ServicePoint {
         this.lastUpdateTime = 0;
     }
 
-    public void addToQueue(Task task) {
+    public synchronized void addToQueue(Task task) {
         queue.add(task);
         if (queue.size() > maxQueueLength) maxQueueLength = queue.size();
     }
@@ -41,22 +41,22 @@ public class ServicePoint {
     /**
      * Remove task from queue without starting service (for pure queues)
      */
-    public Task removeFromQueue() {
+    public synchronized Task removeFromQueue() {
         return queue.isEmpty() ? null : queue.poll();
     }
 
-    public boolean isAvailable() {
+    public synchronized boolean isAvailable() {
         return busyServers < numServers;
     }
 
-    public boolean isQueueEmpty() {
+    public synchronized boolean isQueueEmpty() {
         return queue.isEmpty();
     }
 
     /**
      * Start service by marking a server as busy (for service points without their own queue)
      */
-    public void startService(double currentTime) {
+    public synchronized void startService(double currentTime) {
         if (busyServers < numServers) {
             updateUtilizationTracking(currentTime);
             busyServers++;
@@ -66,7 +66,7 @@ public class ServicePoint {
     /**
      * Begin service by taking task from own queue (for service points with queue)
      */
-    public Task beginService(double currentTime) {
+    public synchronized Task beginService(double currentTime) {
         if (queue.isEmpty() || !isAvailable()) return null;
         updateUtilizationTracking(currentTime);
         busyServers++;
@@ -83,7 +83,7 @@ public class ServicePoint {
     /**
      * End service and update statistics
      */
-    public void endService(double currentTime) {
+    public synchronized void endService(double currentTime) {
         if (busyServers > 0) {
             updateUtilizationTracking(currentTime);
             busyServers--;
@@ -104,7 +104,7 @@ public class ServicePoint {
     /**
      * Calculate utilization based on actual busy time
      */
-    public double getUtilization(double currentTime) {
+    public synchronized double getUtilization(double currentTime) {
         if (isPureQueue || numServers == 0 || currentTime <= 0) {
             return 0.0;
         }
@@ -118,13 +118,13 @@ public class ServicePoint {
     }
 
     public String getName() { return name; }
-    public int getQueueLength() { return queue.size(); }
-    public int getBusyServers() { return busyServers; }
-    public int getTasksServed() { return tasksServed; }
-    public int getMaxQueueLength() { return maxQueueLength; }
+    public synchronized int getQueueLength() { return queue.size(); }
+    public synchronized int getBusyServers() { return busyServers; }
+    public synchronized int getTasksServed() { return tasksServed; }
+    public synchronized int getMaxQueueLength() { return maxQueueLength; }
     public boolean isPureQueue() { return isPureQueue; }
 
-    public double getAverageServiceTime() {
+    public synchronized double getAverageServiceTime() {
         return tasksServed > 0 ? (totalBusyTime / tasksServed) : 0;
     }
 
@@ -136,7 +136,7 @@ public class ServicePoint {
         return 0.0;
     }
 
-    public void reset() {
+    public synchronized void reset() {
         queue.clear();
         busyServers = 0;
         tasksServed = 0;

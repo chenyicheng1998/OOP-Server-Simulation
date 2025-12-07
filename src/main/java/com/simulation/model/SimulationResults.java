@@ -7,8 +7,8 @@ public class SimulationResults {
     private double totalSimulationTime;
     private List<Task> completedTasks = new ArrayList<>();
 
-    public void recordArrival() { totalTasksArrived++; }
-    public void recordCompletion(Task task) {
+    public synchronized void recordArrival() { totalTasksArrived++; }
+    public synchronized void recordCompletion(Task task) {
         totalTasksCompleted++;
         completedTasks.add(task);
         if (task.getTaskType() == TaskType.CPU) cpuTasksCompleted++; else gpuTasksCompleted++;
@@ -22,18 +22,18 @@ public class SimulationResults {
         maxSystemTime = Math.max(maxSystemTime, systemTime);
         minSystemTime = Math.min(minSystemTime, systemTime);
     }
-    public double getAverageSystemTime() { return totalTasksCompleted > 0 ? totalSystemTime / totalTasksCompleted : 0; }
-    public double getThroughput(double simTime) { return simTime > 0 ? totalTasksCompleted / simTime : 0; }
-    public int getTotalTasksArrived() { return totalTasksArrived; }
-    public int getTotalTasksCompleted() { return totalTasksCompleted; }
-    public int getCpuTasksCompleted() { return cpuTasksCompleted; }
-    public int getGpuTasksCompleted() { return gpuTasksCompleted; }
-    public double getMaxSystemTime() { return maxSystemTime; }
-    public double getMinSystemTime() { return minSystemTime == Double.MAX_VALUE ? 0 : minSystemTime; }
-    public int getNormalUserTasksCompleted() { return normalUserTasksCompleted; }
-    public int getPersonalVipTasksCompleted() { return personalVipTasksCompleted; }
-    public int getEnterpriseVipTasksCompleted() { return enterpriseVipTasksCompleted; }
-    public void reset() {
+    public synchronized double getAverageSystemTime() { return totalTasksCompleted > 0 ? totalSystemTime / totalTasksCompleted : 0; }
+    public synchronized double getThroughput(double simTime) { return simTime > 0 ? totalTasksCompleted / simTime : 0; }
+    public synchronized int getTotalTasksArrived() { return totalTasksArrived; }
+    public synchronized int getTotalTasksCompleted() { return totalTasksCompleted; }
+    public synchronized int getCpuTasksCompleted() { return cpuTasksCompleted; }
+    public synchronized int getGpuTasksCompleted() { return gpuTasksCompleted; }
+    public synchronized double getMaxSystemTime() { return maxSystemTime; }
+    public synchronized double getMinSystemTime() { return minSystemTime == Double.MAX_VALUE ? 0 : minSystemTime; }
+    public synchronized int getNormalUserTasksCompleted() { return normalUserTasksCompleted; }
+    public synchronized int getPersonalVipTasksCompleted() { return personalVipTasksCompleted; }
+    public synchronized int getEnterpriseVipTasksCompleted() { return enterpriseVipTasksCompleted; }
+    public synchronized void reset() {
         totalTasksArrived = totalTasksCompleted = cpuTasksCompleted = gpuTasksCompleted = 0;
         totalSystemTime = maxSystemTime = 0;
         minSystemTime = Double.MAX_VALUE;
@@ -43,10 +43,10 @@ public class SimulationResults {
     }
 
     // New methods for database integration
-    public double getTotalSimulationTime() { return totalSimulationTime; }
-    public void setTotalSimulationTime(double time) { this.totalSimulationTime = time; }
-    public List<Task> getCompletedTasks() { return new ArrayList<>(completedTasks); }
-    public int getTotalArrivedTasks() { return totalTasksArrived; }
-    public int getTotalCompletedTasks() { return totalTasksCompleted; }
-    public double getThroughput() { return getThroughput(totalSimulationTime); }
+    public synchronized double getTotalSimulationTime() { return totalSimulationTime; }
+    public synchronized void setTotalSimulationTime(double time) { this.totalSimulationTime = time; }
+    public synchronized List<Task> getCompletedTasks() { return new ArrayList<>(completedTasks); }
+    public synchronized int getTotalArrivedTasks() { return totalTasksArrived; }
+    public synchronized int getTotalCompletedTasks() { return totalTasksCompleted; }
+    public synchronized double getThroughput() { return getThroughput(totalSimulationTime); }
 }
