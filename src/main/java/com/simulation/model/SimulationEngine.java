@@ -46,8 +46,11 @@ public class SimulationEngine extends Thread {
         clock.reset();
         eventList.clear();
         results.reset();
-        dataStorage.reset(); classification.reset(); cpuQueue.reset(); gpuQueue.reset();
-        cpuCompute.reset(); gpuCompute.reset(); resultStorage.reset();
+        dataStorage.reset();
+        classification.reset();
+        cpuCompute.reset();
+        gpuCompute.reset();
+        resultStorage.reset();
         scheduleNextArrival();
     }
     private void scheduleNextArrival() {
@@ -164,42 +167,45 @@ public class SimulationEngine extends Thread {
     }
     private void handleDepartureClassification(Task task) {
         classification.endService(clock.getTime());
+        // Add task directly to CPU/GPU compute service point (which now has its own queue)
         if (task.getTaskType() == TaskType.CPU) {
-            cpuQueue.addToQueue(task);
+            cpuCompute.addToQueue(task);
             if (cpuCompute.isAvailable()) startServiceCpuCompute();
         } else {
-            gpuQueue.addToQueue(task);
+            gpuCompute.addToQueue(task);
             if (gpuCompute.isAvailable()) startServiceGpuCompute();
         }
         if (classification.isAvailable() && !classification.isQueueEmpty()) startServiceClassification();
     }
+
     private void startServiceCpuCompute() {
-        Task task = cpuQueue.removeFromQueue();  // Remove from queue
-        if (task != null && cpuCompute.isAvailable()) {
-            cpuCompute.startService(clock.getTime());  // Mark compute node as busy
+        Task task = cpuCompute.beginService(clock.getTime());
+        if (task != null) {
             double serviceTime = cpuCompute.getServiceTime();
             eventList.addEvent(new Event(EventType.DEP_CPU_COMPUTE, clock.getTime() + serviceTime, task));
         }
     }
+
     private void startServiceGpuCompute() {
-        Task task = gpuQueue.removeFromQueue();  // Remove from queue
-        if (task != null && gpuCompute.isAvailable()) {
-            gpuCompute.startService(clock.getTime());  // Mark compute node as busy
+        Task task = gpuCompute.beginService(clock.getTime());
+        if (task != null) {
             double serviceTime = gpuCompute.getServiceTime();
             eventList.addEvent(new Event(EventType.DEP_GPU_COMPUTE, clock.getTime() + serviceTime, task));
         }
     }
+
     private void handleDepartureCpuCompute(Task task) {
         cpuCompute.endService(clock.getTime());
         resultStorage.addToQueue(task);
         if (resultStorage.isAvailable()) startServiceResultStorage();
-        if (cpuCompute.isAvailable() && !cpuQueue.isQueueEmpty()) startServiceCpuCompute();
+        if (cpuCompute.isAvailable() && !cpuCompute.isQueueEmpty()) startServiceCpuCompute();
     }
+
     private void handleDepartureGpuCompute(Task task) {
         gpuCompute.endService(clock.getTime());
         resultStorage.addToQueue(task);
         if (resultStorage.isAvailable()) startServiceResultStorage();
-        if (gpuCompute.isAvailable() && !gpuQueue.isQueueEmpty()) startServiceGpuCompute();
+        if (gpuCompute.isAvailable() && !gpuCompute.isQueueEmpty()) startServiceGpuCompute();
     }
     private void startServiceResultStorage() {
         Task task = resultStorage.beginService(clock.getTime());
@@ -256,8 +262,6 @@ public class SimulationEngine extends Thread {
     }
     public ServicePoint getDataStorage() { return dataStorage; }
     public ServicePoint getClassification() { return classification; }
-    public ServicePoint getCpuQueue() { return cpuQueue; }
-    public ServicePoint getGpuQueue() { return gpuQueue; }
     public ServicePoint getCpuCompute() { return cpuCompute; }
     public ServicePoint getGpuCompute() { return gpuCompute; }
     public ServicePoint getResultStorage() { return resultStorage; }

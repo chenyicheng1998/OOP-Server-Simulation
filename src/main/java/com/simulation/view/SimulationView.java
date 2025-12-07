@@ -326,31 +326,21 @@ public class SimulationView {
         drawServicePoint(gc, startX, startY, "Classification", Color.LIGHTYELLOW,
             classification.getQueueLength(), classification.getBusyServers());
 
-        // CPU and GPU paths
+        // CPU and GPU paths - compute service points now include their own queues
         double cpuY = startY - 100;
         double gpuY = startY + 100;
 
         drawArrow(gc, startX + 30, startY - 30, startX + 30, cpuY + 30);
-        ServicePoint cpuQueue = engine.getCpuQueue();
-        drawServicePoint(gc, startX, cpuY, "CPU\nQueue", Color.ORANGE,
-            cpuQueue.getQueueLength(), 0);
-        drawArrow(gc, startX + 60, cpuY, startX + spacing, cpuY);
-
-        double cpuComputeX = startX + spacing;
+        double cpuComputeX = startX;
         ServicePoint cpuCompute = engine.getCpuCompute();
         drawServicePoint(gc, cpuComputeX, cpuY, "CPU\nCompute", Color.CORAL,
-            0, cpuCompute.getBusyServers());
+            cpuCompute.getQueueLength(), cpuCompute.getBusyServers());
 
         drawArrow(gc, startX + 30, startY + 30, startX + 30, gpuY - 30);
-        ServicePoint gpuQueue = engine.getGpuQueue();
-        drawServicePoint(gc, startX, gpuY, "GPU\nQueue", Color.PINK,
-            gpuQueue.getQueueLength(), 0);
-        drawArrow(gc, startX + 60, gpuY, startX + spacing, gpuY);
-
-        double gpuComputeX = startX + spacing;
+        double gpuComputeX = startX;
         ServicePoint gpuCompute = engine.getGpuCompute();
         drawServicePoint(gc, gpuComputeX, gpuY, "GPU\nCompute", Color.PLUM,
-            0, gpuCompute.getBusyServers());
+            gpuCompute.getQueueLength(), gpuCompute.getBusyServers());
 
         double resultX = cpuComputeX + spacing;
         drawArrow(gc, cpuComputeX + 60, cpuY, resultX, startY);
@@ -395,9 +385,7 @@ public class SimulationView {
         stats.append("--- Service Point Statistics ---\n");
         addServicePointStats(stats, "Data Storage", engine.getDataStorage());
         addServicePointStats(stats, "Classification", engine.getClassification());
-        addServicePointStats(stats, "CPU Queue", engine.getCpuQueue());
         addServicePointStats(stats, "CPU Compute", engine.getCpuCompute());
-        addServicePointStats(stats, "GPU Queue", engine.getGpuQueue());
         addServicePointStats(stats, "GPU Compute", engine.getGpuCompute());
         addServicePointStats(stats, "Result Storage", engine.getResultStorage());
 

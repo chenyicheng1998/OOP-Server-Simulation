@@ -468,8 +468,6 @@ public class SimulationController {
 
         ServicePoint dataStorage = engine.getDataStorage();
         ServicePoint classification = engine.getClassification();
-        ServicePoint cpuQueue = engine.getCpuQueue();
-        ServicePoint gpuQueue = engine.getGpuQueue();
         ServicePoint cpuCompute = engine.getCpuCompute();
         ServicePoint gpuCompute = engine.getGpuCompute();
         ServicePoint resultStorage = engine.getResultStorage();
@@ -487,10 +485,6 @@ public class SimulationController {
             classification.getQueueLength(), classification.getBusyServers(), 1, classification.getMaxQueueLength()));
         sb.append(String.format("   Utilization: %.1f%%\n\n", classification.getUtilization(currentTime) * 100));
 
-        sb.append("💻 CPU Queue:\n");
-        sb.append(String.format("   Waiting: %d | Max: %d\n\n",
-            cpuQueue.getQueueLength(), cpuQueue.getMaxQueueLength()));
-
         sb.append("💻 CPU Compute:\n");
         sb.append(String.format("   Queue: %d | Busy: %d/%d | Max: %d\n",
             cpuCompute.getQueueLength(), cpuCompute.getBusyServers(),
@@ -498,9 +492,6 @@ public class SimulationController {
         sb.append(String.format("   Utilization: %.1f%% | Served: %d\n\n",
             cpuCompute.getUtilization(currentTime) * 100, cpuCompute.getTasksServed()));
 
-        sb.append("🎮 GPU Queue:\n");
-        sb.append(String.format("   Waiting: %d | Max: %d\n\n",
-            gpuQueue.getQueueLength(), gpuQueue.getMaxQueueLength()));
 
         sb.append("🎮 GPU Compute:\n");
         sb.append(String.format("   Queue: %d | Busy: %d/%d | Max: %d\n",
@@ -744,31 +735,21 @@ public class SimulationController {
         drawServicePoint(gc, startX, startY, "Classification", Color.LIGHTYELLOW,
             classification.getQueueLength(), classification.getBusyServers());
 
-        // CPU and GPU paths
+        // CPU and GPU paths - now compute service points include their own queues
         double cpuY = startY - 100;
         double gpuY = startY + 100;
 
         drawArrow(gc, startX + 30, startY - 30, startX + 30, cpuY + 30);
-        ServicePoint cpuQueue = engine.getCpuQueue();
-        drawServicePoint(gc, startX, cpuY, "CPU\nQueue", Color.ORANGE,
-            cpuQueue.getQueueLength(), 0);
-        drawArrow(gc, startX + 60, cpuY, startX + spacing, cpuY);
-
-        double cpuComputeX = startX + spacing;
+        double cpuComputeX = startX;
         ServicePoint cpuCompute = engine.getCpuCompute();
         drawServicePoint(gc, cpuComputeX, cpuY, "CPU\nCompute", Color.CORAL,
-            0, cpuCompute.getBusyServers());
+            cpuCompute.getQueueLength(), cpuCompute.getBusyServers());
 
         drawArrow(gc, startX + 30, startY + 30, startX + 30, gpuY - 30);
-        ServicePoint gpuQueue = engine.getGpuQueue();
-        drawServicePoint(gc, startX, gpuY, "GPU\nQueue", Color.PINK,
-            gpuQueue.getQueueLength(), 0);
-        drawArrow(gc, startX + 60, gpuY, startX + spacing, gpuY);
-
-        double gpuComputeX = startX + spacing;
+        double gpuComputeX = startX;
         ServicePoint gpuCompute = engine.getGpuCompute();
         drawServicePoint(gc, gpuComputeX, gpuY, "GPU\nCompute", Color.PLUM,
-            0, gpuCompute.getBusyServers());
+            gpuCompute.getQueueLength(), gpuCompute.getBusyServers());
 
         double resultX = cpuComputeX + spacing;
         drawArrow(gc, cpuComputeX + 60, cpuY, resultX, startY);
