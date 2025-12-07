@@ -450,8 +450,250 @@ public class SimulationController {
         avgSystemTimeLabel.setText(String.format("%.2fs", results.getAverageSystemTime()));
         throughputLabel.setText(String.format("%.3f/s", results.getThroughput()));
 
-        // Update queue stats, user type stats, task type stats
-        // TODO: Format and display detailed statistics
+        // Update queue stats
+        updateQueueStatistics();
+
+        // Update user type stats
+        updateUserTypeStatistics();
+
+        // Update task type stats
+        updateTaskTypeStatistics();
+    }
+
+    /**
+     * Update Queue Statistics display
+     */
+    private void updateQueueStatistics() {
+        if (engine == null || queueStatsLabel == null) return;
+
+        ServicePoint dataStorage = engine.getDataStorage();
+        ServicePoint classification = engine.getClassification();
+        ServicePoint cpuQueue = engine.getCpuQueue();
+        ServicePoint gpuQueue = engine.getGpuQueue();
+        ServicePoint cpuCompute = engine.getCpuCompute();
+        ServicePoint gpuCompute = engine.getGpuCompute();
+        ServicePoint resultStorage = engine.getResultStorage();
+
+        double currentTime = Clock.getInstance().getTime();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("📦 Data Storage:\n");
+        sb.append(String.format("   Queue: %d | Busy: %d/%d | Max: %d\n",
+            dataStorage.getQueueLength(), dataStorage.getBusyServers(), 1, dataStorage.getMaxQueueLength()));
+        sb.append(String.format("   Utilization: %.1f%%\n\n", dataStorage.getUtilization(currentTime) * 100));
+
+        sb.append("🔍 Classification:\n");
+        sb.append(String.format("   Queue: %d | Busy: %d/%d | Max: %d\n",
+            classification.getQueueLength(), classification.getBusyServers(), 1, classification.getMaxQueueLength()));
+        sb.append(String.format("   Utilization: %.1f%%\n\n", classification.getUtilization(currentTime) * 100));
+
+        sb.append("💻 CPU Queue:\n");
+        sb.append(String.format("   Waiting: %d | Max: %d\n\n",
+            cpuQueue.getQueueLength(), cpuQueue.getMaxQueueLength()));
+
+        sb.append("💻 CPU Compute:\n");
+        sb.append(String.format("   Queue: %d | Busy: %d/%d | Max: %d\n",
+            cpuCompute.getQueueLength(), cpuCompute.getBusyServers(),
+            config.getNumCpuNodes(), cpuCompute.getMaxQueueLength()));
+        sb.append(String.format("   Utilization: %.1f%% | Served: %d\n\n",
+            cpuCompute.getUtilization(currentTime) * 100, cpuCompute.getTasksServed()));
+
+        sb.append("🎮 GPU Queue:\n");
+        sb.append(String.format("   Waiting: %d | Max: %d\n\n",
+            gpuQueue.getQueueLength(), gpuQueue.getMaxQueueLength()));
+
+        sb.append("🎮 GPU Compute:\n");
+        sb.append(String.format("   Queue: %d | Busy: %d/%d | Max: %d\n",
+            gpuCompute.getQueueLength(), gpuCompute.getBusyServers(),
+            config.getNumGpuNodes(), gpuCompute.getMaxQueueLength()));
+        sb.append(String.format("   Utilization: %.1f%% | Served: %d\n\n",
+            gpuCompute.getUtilization(currentTime) * 100, gpuCompute.getTasksServed()));
+
+        sb.append("💾 Result Storage:\n");
+        sb.append(String.format("   Queue: %d | Busy: %d/%d | Max: %d\n",
+            resultStorage.getQueueLength(), resultStorage.getBusyServers(), 1, resultStorage.getMaxQueueLength()));
+        sb.append(String.format("   Utilization: %.1f%%", resultStorage.getUtilization(currentTime) * 100));
+
+        queueStatsLabel.setText(sb.toString());
+    }
+
+    /**
+     * Update User Type Statistics display
+     */
+    private void updateUserTypeStatistics() {
+        if (engine == null || userTypeStatsLabel == null) return;
+
+        SimulationResults results = engine.getResults();
+        int totalCompleted = results.getTotalCompletedTasks();
+
+        if (totalCompleted == 0) {
+            userTypeStatsLabel.setText("No tasks completed yet...");
+            return;
+        }
+
+        int normalCompleted = results.getNormalUserTasksCompleted();
+        int personalVipCompleted = results.getPersonalVipTasksCompleted();
+        int enterpriseVipCompleted = results.getEnterpriseVipTasksCompleted();
+
+        // Calculate average system time for each user type
+        Map<UserType, Double> avgSystemTimeByUser = calculateAverageSystemTimeByUserType();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("👤 NORMAL Users:\n");
+        sb.append(String.format("   Completed: %d (%.1f%%)\n",
+            normalCompleted, (normalCompleted * 100.0 / totalCompleted)));
+        sb.append(String.format("   Avg System Time: %.2fs\n\n",
+            avgSystemTimeByUser.getOrDefault(UserType.NORMAL, 0.0)));
+
+        sb.append("⭐ PERSONAL VIP:\n");
+        sb.append(String.format("   Completed: %d (%.1f%%)\n",
+            personalVipCompleted, (personalVipCompleted * 100.0 / totalCompleted)));
+        sb.append(String.format("   Avg System Time: %.2fs\n\n",
+            avgSystemTimeByUser.getOrDefault(UserType.PERSONAL_VIP, 0.0)));
+
+        sb.append("⭐⭐ ENTERPRISE VIP:\n");
+        sb.append(String.format("   Completed: %d (%.1f%%)\n",
+            enterpriseVipCompleted, (enterpriseVipCompleted * 100.0 / totalCompleted)));
+        sb.append(String.format("   Avg System Time: %.2fs\n\n",
+            avgSystemTimeByUser.getOrDefault(UserType.ENTERPRISE_VIP, 0.0)));
+
+        // Add comparison
+        sb.append("📊 Priority Effect:\n");
+        double normalTime = avgSystemTimeByUser.getOrDefault(UserType.NORMAL, 0.0);
+        double enterpriseTime = avgSystemTimeByUser.getOrDefault(UserType.ENTERPRISE_VIP, 0.0);
+        if (normalTime > 0 && enterpriseTime > 0) {
+            double improvement = ((normalTime - enterpriseTime) / normalTime) * 100;
+            sb.append(String.format("   Enterprise VIP is %.1f%% faster", improvement));
+        } else {
+            sb.append("   Insufficient data");
+        }
+
+        userTypeStatsLabel.setText(sb.toString());
+    }
+
+    /**
+     * Update Task Type Statistics display
+     */
+    private void updateTaskTypeStatistics() {
+        if (engine == null || taskTypeStatsLabel == null) return;
+
+        SimulationResults results = engine.getResults();
+        int totalCompleted = results.getTotalCompletedTasks();
+
+        if (totalCompleted == 0) {
+            taskTypeStatsLabel.setText("No tasks completed yet...");
+            return;
+        }
+
+        int cpuCompleted = results.getCpuTasksCompleted();
+        int gpuCompleted = results.getGpuTasksCompleted();
+
+        // Calculate average system time for each task type
+        Map<TaskType, Double> avgSystemTimeByTask = calculateAverageSystemTimeByTaskType();
+
+        ServicePoint cpuCompute = engine.getCpuCompute();
+        ServicePoint gpuCompute = engine.getGpuCompute();
+        double currentTime = Clock.getInstance().getTime();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("💻 CPU Tasks:\n");
+        sb.append(String.format("   Completed: %d (%.1f%%)\n",
+            cpuCompleted, (cpuCompleted * 100.0 / totalCompleted)));
+        sb.append(String.format("   Avg System Time: %.2fs\n",
+            avgSystemTimeByTask.getOrDefault(TaskType.CPU, 0.0)));
+        sb.append(String.format("   Node Utilization: %.1f%%\n\n",
+            cpuCompute.getUtilization(currentTime) * 100));
+
+        sb.append("🎮 GPU Tasks:\n");
+        sb.append(String.format("   Completed: %d (%.1f%%)\n",
+            gpuCompleted, (gpuCompleted * 100.0 / totalCompleted)));
+        sb.append(String.format("   Avg System Time: %.2fs\n",
+            avgSystemTimeByTask.getOrDefault(TaskType.GPU, 0.0)));
+        sb.append(String.format("   Node Utilization: %.1f%%\n\n",
+            gpuCompute.getUtilization(currentTime) * 100));
+
+        // Add resource efficiency analysis
+        sb.append("⚡ Resource Efficiency:\n");
+        double cpuUtil = cpuCompute.getUtilization(currentTime) * 100;
+        double gpuUtil = gpuCompute.getUtilization(currentTime) * 100;
+
+        if (cpuUtil > 90) {
+            sb.append("   ⚠️ CPU nodes overloaded\n");
+        } else if (cpuUtil < 30) {
+            sb.append("   💡 CPU nodes underutilized\n");
+        } else {
+            sb.append("   ✅ CPU nodes balanced\n");
+        }
+
+        if (gpuUtil > 90) {
+            sb.append("   ⚠️ GPU nodes overloaded");
+        } else if (gpuUtil < 30) {
+            sb.append("   💡 GPU nodes underutilized");
+        } else {
+            sb.append("   ✅ GPU nodes balanced");
+        }
+
+        taskTypeStatsLabel.setText(sb.toString());
+    }
+
+    /**
+     * Calculate average system time grouped by user type
+     */
+    private Map<UserType, Double> calculateAverageSystemTimeByUserType() {
+        Map<UserType, Double> result = new HashMap<>();
+        Map<UserType, Integer> counts = new HashMap<>();
+
+        if (engine == null) return result;
+
+        SimulationResults results = engine.getResults();
+        List<Task> completedTasks = results.getCompletedTasks();
+
+        for (Task task : completedTasks) {
+            UserType type = task.getUserType();
+            double systemTime = task.getTotalSystemTime();
+            result.put(type, result.getOrDefault(type, 0.0) + systemTime);
+            counts.put(type, counts.getOrDefault(type, 0) + 1);
+        }
+
+        // Calculate averages
+        for (UserType type : result.keySet()) {
+            int count = counts.get(type);
+            if (count > 0) {
+                result.put(type, result.get(type) / count);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Calculate average system time grouped by task type
+     */
+    private Map<TaskType, Double> calculateAverageSystemTimeByTaskType() {
+        Map<TaskType, Double> result = new HashMap<>();
+        Map<TaskType, Integer> counts = new HashMap<>();
+
+        if (engine == null) return result;
+
+        SimulationResults results = engine.getResults();
+        List<Task> completedTasks = results.getCompletedTasks();
+
+        for (Task task : completedTasks) {
+            TaskType type = task.getTaskType();
+            double systemTime = task.getTotalSystemTime();
+            result.put(type, result.getOrDefault(type, 0.0) + systemTime);
+            counts.put(type, counts.getOrDefault(type, 0) + 1);
+        }
+
+        // Calculate averages
+        for (TaskType type : result.keySet()) {
+            int count = counts.get(type);
+            if (count > 0) {
+                result.put(type, result.get(type) / count);
+            }
+        }
+
+        return result;
     }
 
     private void updateVisualization() {
