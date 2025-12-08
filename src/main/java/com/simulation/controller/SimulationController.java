@@ -45,6 +45,7 @@ public class SimulationController {
     @FXML private TextField cpuNodesField;
     @FXML private TextField gpuNodesField;
     @FXML private TextField cpuProbabilityField;
+    @FXML private TextField resultStorageServiceTimeField;
 
     @FXML private Slider speedSlider;
     @FXML private Canvas visualizationCanvas;
@@ -823,6 +824,7 @@ public class SimulationController {
             config.setNumCpuNodes(Integer.parseInt(cpuNodesField.getText()));
             config.setNumGpuNodes(Integer.parseInt(gpuNodesField.getText()));
             config.setCpuTaskProbability(Double.parseDouble(cpuProbabilityField.getText()));
+            config.setResultStorageServiceTime(Double.parseDouble(resultStorageServiceTimeField.getText()));
         } catch (NumberFormatException e) {
             showError("Input Error", "Please check configuration parameter format");
         }
@@ -834,6 +836,7 @@ public class SimulationController {
         cpuNodesField.setText(String.valueOf(config.getNumCpuNodes()));
         gpuNodesField.setText(String.valueOf(config.getNumGpuNodes()));
         cpuProbabilityField.setText(String.valueOf(config.getCpuTaskProbability()));
+        resultStorageServiceTimeField.setText(String.valueOf(config.getResultStorageServiceTime()));
     }
 
     private void copyConfig(SimulationConfig source, SimulationConfig dest) {

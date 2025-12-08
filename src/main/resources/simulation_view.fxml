@@ -137,7 +137,7 @@
             <GridPane hgap="10" vgap="5" style="-fx-padding: 5;">
                 <!-- Row 0 -->
                 <Label text="Mean Arrival Interval (s):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="arrivalIntervalField" text="2.0" prefWidth="100"
+                <TextField fx:id="arrivalIntervalField" text="1.0" prefWidth="100"
                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                 <Label text="Simulation Time (s):" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
@@ -146,11 +146,11 @@
 
                 <!-- Row 1 -->
                 <Label text="CPU Nodes:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextField fx:id="cpuNodesField" text="2" prefWidth="100"
+                <TextField fx:id="cpuNodesField" text="4" prefWidth="100"
                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
                 <Label text="GPU Nodes:" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-                <TextField fx:id="gpuNodesField" text="1" prefWidth="100"
+                <TextField fx:id="gpuNodesField" text="3" prefWidth="100"
                           GridPane.rowIndex="1" GridPane.columnIndex="3"/>
 
                 <!-- Row 2 -->
@@ -158,8 +158,13 @@
                 <TextField fx:id="cpuProbabilityField" text="0.7" prefWidth="100"
                           GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                <Label text="Database:" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
-                <HBox spacing="5" GridPane.rowIndex="2" GridPane.columnIndex="3">
+                <Label text="Result Storage Time (s):" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                <TextField fx:id="resultStorageServiceTimeField" text="1.5" prefWidth="100"
+                          GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+                <!-- Row 3 -->
+                <Label text="Database:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <HBox spacing="5" GridPane.rowIndex="3" GridPane.columnIndex="1">
                     <Label fx:id="dbStatusLabel" text="❌ Not Connected" styleClass="db-status"/>
                     <Button text="Test" onAction="#handleTestDatabase" prefWidth="60"/>
                 </HBox>

@@ -1,13 +1,13 @@
 package com.simulation.model;
 public class SimulationConfig {
-    private double meanArrivalInterval = 2.0;
+    private double meanArrivalInterval = 1.0;
     private double dataStorageServiceTime = 1.0;
     private double classificationServiceTime = 0.5;
     private double cpuComputeServiceTime = 5.0;
     private double gpuComputeServiceTime = 8.0;
     private double resultStorageServiceTime = 1.5;
-    private int numCpuNodes = 2;
-    private int numGpuNodes = 1;
+    private int numCpuNodes = 4;
+    private int numGpuNodes = 3;
     private double cpuTaskProbability = 0.7;
     private double normalUserProbability = 0.6;
     private double personalVipProbability = 0.3;
