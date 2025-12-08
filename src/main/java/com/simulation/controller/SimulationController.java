@@ -717,7 +717,7 @@ public class SimulationController {
         gc.setLineWidth(2);
 
         double startX = 50;
-        double startY = 300;
+        double startY = 200;  // Reduced from 300 to 200 to fit in smaller canvas
         double spacing = 100;
 
         // Draw service points with current state
@@ -736,8 +736,8 @@ public class SimulationController {
             classification.getQueueLength(), classification.getBusyServers());
 
         // CPU and GPU paths - now compute service points include their own queues
-        double cpuY = startY - 100;
-        double gpuY = startY + 100;
+        double cpuY = startY - 80;  // Reduced from 100 to 80 for more compact layout
+        double gpuY = startY + 80;  // Reduced from 100 to 80 for more compact layout
 
         drawArrow(gc, startX + 30, startY - 30, startX + 30, cpuY + 30);
         double cpuComputeX = startX;

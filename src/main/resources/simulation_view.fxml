@@ -9,23 +9,23 @@
 <BorderPane xmlns="http://javafx.com/javafx/20.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.simulation.controller.SimulationController"
-            prefHeight="900.0" prefWidth="1600.0"
+            prefHeight="750.0" prefWidth="1280.0"
             stylesheets="@styles.css">
 
     <!-- Top: Title and Control Panel -->
     <top>
-        <VBox spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+        <VBox spacing="8" style="-fx-background-color: #2c3e50; -fx-padding: 8;">
             <!-- Title -->
             <HBox alignment="CENTER">
                 <Label text="☁️ Cloud Computing Service Queue Simulation" textFill="white">
                     <font>
-                        <Font name="System Bold" size="24.0"/>
+                        <Font name="System Bold" size="20.0"/>
                     </font>
                 </Label>
             </HBox>
 
             <!-- Control Buttons -->
-            <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10;">
+            <HBox spacing="15" alignment="CENTER" style="-fx-padding: 5;">
                 <Button fx:id="startButton" text="▶️ Start" onAction="#handleStart"
                         styleClass="control-button" prefWidth="100"/>
                 <Button fx:id="pauseButton" text="⏸ Pause" onAction="#handlePause"
@@ -56,28 +56,28 @@
 
     <!-- Center: Visualization Canvas -->
     <center>
-        <VBox spacing="10" style="-fx-padding: 10;">
+        <VBox spacing="5" style="-fx-padding: 5;">
             <Label text="System Visualization" styleClass="section-title">
-                <font><Font name="System Bold" size="16.0"/></font>
+                <font><Font name="System Bold" size="14.0"/></font>
             </Label>
             <StackPane style="-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 2;">
-                <Canvas fx:id="visualizationCanvas" width="900" height="600"/>
+                <Canvas fx:id="visualizationCanvas" width="800" height="400"/>
             </StackPane>
         </VBox>
     </center>
 
     <!-- Right: Statistics Panel -->
     <right>
-        <VBox spacing="10" style="-fx-padding: 10;" prefWidth="350">
+        <VBox spacing="5" style="-fx-padding: 5;" prefWidth="300">
             <Label text="📊 Real-time Statistics" styleClass="section-title">
-                <font><Font name="System Bold" size="16.0"/></font>
+                <font><Font name="System Bold" size="14.0"/></font>
             </Label>
 
             <ScrollPane fitToWidth="true" style="-fx-background-color: white;">
-                <VBox spacing="10" style="-fx-padding: 10;">
+                <VBox spacing="5" style="-fx-padding: 5;">
                     <!-- Overall Statistics -->
                     <TitledPane text="Overall Statistics" expanded="true" collapsible="false">
-                        <GridPane hgap="10" vgap="8" style="-fx-padding: 10;">
+                        <GridPane hgap="8" vgap="5" style="-fx-padding: 5;">
                             <Label text="Tasks Arrived:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                             <Label fx:id="arrivedTasksLabel" text="0" styleClass="stat-value"
                                    GridPane.rowIndex="0" GridPane.columnIndex="1"/>
@@ -98,21 +98,21 @@
 
                     <!-- Queue Statistics -->
                     <TitledPane text="Queue Statistics" expanded="true" collapsible="false">
-                        <VBox spacing="5" style="-fx-padding: 10;">
+                        <VBox spacing="3" style="-fx-padding: 5;">
                             <Label fx:id="queueStatsLabel" text="" wrapText="true"/>
                         </VBox>
                     </TitledPane>
 
                     <!-- User Type Statistics -->
                     <TitledPane text="User Type Statistics" expanded="true" collapsible="false">
-                        <VBox spacing="5" style="-fx-padding: 10;">
+                        <VBox spacing="3" style="-fx-padding: 5;">
                             <Label fx:id="userTypeStatsLabel" text="" wrapText="true"/>
                         </VBox>
                     </TitledPane>
 
                     <!-- Task Type Statistics -->
                     <TitledPane text="Task Type Statistics" expanded="true" collapsible="false">
-                        <VBox spacing="5" style="-fx-padding: 10;">
+                        <VBox spacing="3" style="-fx-padding: 5;">
                             <Label fx:id="taskTypeStatsLabel" text="" wrapText="true"/>
                         </VBox>
                     </TitledPane>
@@ -123,10 +123,10 @@
 
     <!-- Bottom: Configuration Panel -->
     <bottom>
-        <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: #ecf0f1;">
+        <VBox spacing="5" style="-fx-padding: 5; -fx-background-color: #ecf0f1;">
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="⚙️ Configuration Parameters" styleClass="section-title">
-                    <font><Font name="System Bold" size="16.0"/></font>
+                    <font><Font name="System Bold" size="14.0"/></font>
                 </Label>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button text="💾 Save Config" onAction="#handleSaveConfig" styleClass="config-button"/>
@@ -134,7 +134,7 @@
                 <Button text="📊 View History" onAction="#handleViewHistory" styleClass="config-button"/>
             </HBox>
 
-            <GridPane hgap="15" vgap="10" style="-fx-padding: 10;">
+            <GridPane hgap="10" vgap="5" style="-fx-padding: 5;">
                 <!-- Row 0 -->
                 <Label text="Mean Arrival Interval (s):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                 <TextField fx:id="arrivalIntervalField" text="2.0" prefWidth="100"
@@ -167,8 +167,8 @@
 
             <!-- Add Simulation History table -->
             <TitledPane text="Simulation History" expanded="true" collapsible="true">
-                <VBox spacing="5" style="-fx-padding: 10;">
-                    <TableView fx:id="historyTable" prefHeight="200" prefWidth="600">
+                <VBox spacing="5" style="-fx-padding: 5;">
+                    <TableView fx:id="historyTable" prefHeight="180" prefWidth="600">
                         <columns>
                             <TableColumn fx:id="runIdColumn" text="Run ID" prefWidth="80"/>
                             <TableColumn fx:id="runNameColumn" text="Run Name" prefWidth="200"/>

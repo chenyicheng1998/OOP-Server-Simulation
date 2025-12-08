@@ -51,8 +51,8 @@ public class SimulatorApp extends Application {
             // Configure stage
             primaryStage.setTitle("☁️ Cloud Computing Service Queue Simulation");
             primaryStage.setScene(scene);
-            primaryStage.setMinWidth(1400);
-            primaryStage.setMinHeight(900);
+            primaryStage.setMinWidth(1280);
+            primaryStage.setMinHeight(750);
 
             // Set application icon (optional)
             // primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.png")));
