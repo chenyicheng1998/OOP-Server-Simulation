@@ -1,810 +1,287 @@
-# 场景化应用指南 (Scenario Guide)
+# Scenario Guide
 
-## 📋 文档说明
+📋 Document Description
 
-本指南通过实际场景和案例，帮助您理解如何使用云计算服务队列仿真系统解决实际问题。
+This guide uses practical scenarios and cases to help you understand how to use the Cloud Computing Service Queue Simulation System to solve real-world problems.
 
-**相关文档**：
-- **USER_GUIDE.md** - 界面和参数详细说明
-- **STATISTICS_IMPLEMENTATION.md** - 技术实现细节
+Related Documents:
 
----
-
-## 🎯 应用场景概览
-
-| 场景 | 目标 | 关键指标 |
-|-----|------|---------|
-| 场景1：评估系统容量 | 找到最大负载能力 | 平均系统时间、吞吐量 |
-| 场景2：优化资源配置 | 确定最优CPU/GPU比例 | 利用率、成本效益 |
-| 场景3：VIP优先级验证 | 证明VIP服务价值 | 用户类型统计 |
-| 场景4：成本优化 | 降低硬件成本 | 利用率、吞吐量 |
-| 场景5：高峰期规划 | 应对流量激增 | 队列长度、响应时间 |
-| 场景6：业务场景适配 | 匹配特定业务需求 | 任务类型分布 |
+* `USER_GUIDE.md` – Detailed interface and parameter explanation
+* `STATISTICS_IMPLEMENTATION.md` – Technical implementation details
 
 ---
 
-## 🔬 场景1：评估系统容量
+🎯 Application Scenarios Overview
 
-### 业务背景
-您是云服务提供商，需要确定当前系统配置能承受的最大用户并发量。
+| Scenario                                 | Objective                            | Key Metrics                     |
+| ---------------------------------------- | ------------------------------------ | ------------------------------- |
+| Scenario 1: System Capacity Evaluation   | Find maximum load capacity           | Average System Time, Throughput |
+| Scenario 2: Resource Optimization        | Determine optimal CPU/GPU ratio      | Utilization, Cost-effectiveness |
+| Scenario 3: VIP Priority Verification    | Demonstrate VIP service value        | User Type Statistics            |
+| Scenario 4: Cost Optimization            | Reduce hardware cost                 | Utilization, Throughput         |
+| Scenario 5: Peak Hour Planning           | Handle traffic surge                 | Queue Length, Response Time     |
+| Scenario 6: Business Scenario Adaptation | Match specific business requirements | Task Type Distribution          |
 
-### 目标
-找到系统开始出现明显性能下降的临界点（饱和点）
+---
 
-### 实验设计
+🔬 Scenario 1: System Capacity Evaluation
 
-**固定配置**:
-- CPU Nodes: 2
-- GPU Nodes: 1
-- CPU Task Probability: 0.7
-- Simulation Time: 2000s
+**Business Background**
 
-**变量**: Mean Arrival Interval（逐步降低，增加负载）
+You are a cloud service provider and need to determine the maximum concurrent users your current system configuration can handle.
 
-### 操作步骤
+**Objective**
 
-1. **设置初始参数**
-   ```
-   Mean Arrival Interval: 5.0s
-   点击 Start
-   等待完成
-   记录结果
-   ```
+Find the critical point where the system shows significant performance degradation (saturation point).
 
-2. **逐步增加负载**
-   ```
-   依次测试到达间隔：
+**Experiment Design**
+
+* Fixed configuration:
+
+    * CPU Nodes: 2
+    * GPU Nodes: 1
+    * CPU Task Probability: 0.7
+    * Simulation Time: 2000s
+* Variable: Mean Arrival Interval (gradually reduced to increase load)
+
+**Procedure**
+
+1. Set initial parameters:
+
+    * Mean Arrival Interval: 5.0s
+    * Click Start
+    * Wait for completion
+    * Record results
+
+2. Gradually increase load by testing arrival intervals:
    5.0s → 3.0s → 2.0s → 1.5s → 1.0s → 0.5s
-   
-   每次都记录：
-   - Avg System Time
-   - Throughput
-   - CPU/GPU Utilization
-   - Max Queue Length
-   ```
 
-### 实验结果分析
+3. Record for each interval:
 
-| 到达间隔 | 任务到达率 | Avg System Time | Throughput | CPU利用率 | 结论 |
-|---------|-----------|-----------------|------------|-----------|------|
-| 5.0s | 0.20/s | 8.5s | 0.19/s | 45% | ✅ 轻载 - 资源浪费 |
-| 3.0s | 0.33/s | 10.2s | 0.32/s | 68% | ✅ 正常 - 良好运行 |
-| 2.0s | 0.50/s | 12.3s | 0.48/s | 82% | ✅ 较高负载 - 可接受 |
-| 1.5s | 0.67/s | 18.7s | 0.55/s | 91% | ⚠️ 接近饱和 |
-| 1.0s | 1.00/s | 35.4s | 0.61/s | 96% | ⚠️ 过载 - 性能下降 |
-| 0.5s | 2.00/s | 125.8s | 0.58/s | 98% | ❌ 严重过载 |
+    * Avg System Time
+    * Throughput
+    * CPU/GPU Utilization
+    * Max Queue Length
 
-### 观察要点
+**Results Analysis**
 
-**查看 Queue Statistics**:
-```
-💻 CPU Compute:
-   到达间隔 5.0s: Max Queue = 2
-   到达间隔 2.0s: Max Queue = 8
-   到达间隔 1.0s: Max Queue = 25 ⚠️
-   到达间隔 0.5s: Max Queue = 78 ❌
-```
+| Arrival Interval | Task Arrival Rate | Avg System Time | Throughput | CPU Utilization | Conclusion                             |
+| ---------------- | ----------------- | --------------- | ---------- | --------------- | -------------------------------------- |
+| 5.0s             | 0.20/s            | 8.5s            | 0.19/s     | 45%             | ✅ Light load – resources underutilized |
+| 3.0s             | 0.33/s            | 10.2s           | 0.32/s     | 68%             | ✅ Normal – stable operation            |
+| 2.0s             | 0.50/s            | 12.3s           | 0.48/s     | 82%             | ✅ High load – acceptable               |
+| 1.5s             | 0.67/s            | 18.7s           | 0.55/s     | 91%             | ⚠️ Near saturation                     |
+| 1.0s             | 1.00/s            | 35.4s           | 0.61/s     | 96%             | ⚠️ Overload – performance degradation  |
+| 0.5s             | 2.00/s            | 125.8s          | 0.58/s     | 98%             | ❌ Severe overload                      |
 
-**性能拐点识别**:
-- 1.5s 到 1.0s 之间出现明显性能下降
-- 平均系统时间从 18.7s 跃升到 35.4s
-- CPU利用率超过 90%
+**Observations**
 
-### 结论和建议
+* CPU Compute Queue:
 
-**容量评估**:
-- **安全负载**: 到达间隔 > 2.0s (吞吐量 0.48/s)
-- **最大负载**: 到达间隔 ≈ 1.5s (吞吐量 0.55/s)
-- **危险区域**: 到达间隔 < 1.0s (系统崩溃边缘)
+    * Arrival Interval 5.0s: Max Queue = 2
+    * Arrival Interval 2.0s: Max Queue = 8
+    * Arrival Interval 1.0s: Max Queue = 25 ⚠️
+    * Arrival Interval 0.5s: Max Queue = 78 ❌
+* Performance breakpoint identified between 1.5s–1.0s
+* Avg System Time jumps from 18.7s → 35.4s
+* CPU utilization exceeds 90%
 
-**业务建议**:
-1. 当前配置支持约 **0.48 tasks/s** 的稳定负载
-2. 建议预留 20% 缓冲，实际规划 **0.40 tasks/s**
-3. 如需支持更高负载，必须增加CPU节点
+**Conclusion & Recommendations**
 
-**扩容规划**:
-- 增加1个CPU节点 → 预计支持 0.65-0.70 tasks/s
-- 增加2个CPU节点 → 预计支持 0.80-0.90 tasks/s
+* Safe Load: Arrival Interval > 2.0s (Throughput 0.48/s)
+* Maximum Load: Arrival Interval ≈ 1.5s (Throughput 0.55/s)
+* Danger Zone: Arrival Interval < 1.0s (System close to collapse)
+
+Business Recommendation:
+
+* Current configuration supports ~0.48 tasks/s stable load
+* Reserve 20% buffer → plan for 0.40 tasks/s
+* To support higher load, increase CPU nodes
+
+Scaling Plan:
+
+* +1 CPU node → support 0.65–0.70 tasks/s
+* +2 CPU nodes → support 0.80–0.90 tasks/s
 
 ---
 
-## 💰 场景2：优化资源配置（成本效益分析）
+💰 Scenario 2: Resource Optimization (Cost-Effectiveness Analysis)
 
-### 业务背景
-您的公司已确定目标吞吐量为 0.45 tasks/s，现在需要找到最经济的硬件配置方案。
+**Business Background**
 
-### 目标
-在满足性能要求的前提下，最小化硬件成本
+Target throughput: 0.45 tasks/s. Find the most economical hardware configuration.
 
-### 实验设计
+**Objective**
 
-**固定配置**:
-- Mean Arrival Interval: 2.0s (目标吞吐量约 0.45/s)
-- CPU Task Probability: 0.7
-- Simulation Time: 2000s
+Minimize hardware cost while meeting performance requirements.
 
-**变量**: CPU Nodes 和 GPU Nodes 的不同组合
+**Experiment Design**
 
-### 成本假设
-```
-CPU节点成本: $100/月/节点
-GPU节点成本: $300/月/节点
-性能要求: Avg System Time < 20s, Throughput > 0.45/s
-```
+* Fixed configuration:
 
-### 测试配置矩阵
+    * Mean Arrival Interval: 2.0s (target throughput ~0.45/s)
+    * CPU Task Probability: 0.7
+    * Simulation Time: 2000s
+* Variable: CPU and GPU node combinations
 
-| 配置# | CPU节点 | GPU节点 | 月成本 | Avg Time | Throughput | CPU利用率 | GPU利用率 | 结果 |
-|------|---------|---------|--------|----------|------------|-----------|-----------|------|
-| 1 | 1 | 1 | $400 | 35.2s | 0.25/s | 98% | 42% | ❌ 不达标 |
-| 2 | 2 | 1 | $500 | 18.5s | 0.45/s | 85% | 46% | ✅ 达标 |
-| 3 | 3 | 1 | $600 | 15.3s | 0.48/s | 62% | 48% | ✅ 过度配置 |
-| 4 | 2 | 2 | $800 | 16.2s | 0.47/s | 87% | 23% | ⚠️ GPU浪费 |
-| 5 | 1 | 2 | $700 | 32.1s | 0.28/s | 96% | 25% | ❌ 不达标 |
+**Cost Assumptions**
 
-### 操作步骤
+* CPU node: $100/month
+* GPU node: $300/month
+* Performance requirements: Avg System Time < 20s, Throughput > 0.45/s
 
-1. **测试配置1: CPU=1, GPU=1**
-   ```
-   设置参数
-   Start仿真
-   观察统计数据
-   
-   结果：
-   - Avg System Time: 35.2s (超标！)
-   - CPU Utilization: 98% (过载！)
-   - 结论：CPU不足，不满足要求
-   ```
+**Test Configurations**
 
-2. **测试配置2: CPU=2, GPU=1**
-   ```
-   设置参数
-   Start仿真
-   观察统计数据
-   
-   结果：
-   - Avg System Time: 18.5s (✅)
-   - Throughput: 0.45/s (✅)
-   - CPU Utilization: 85% (✅ 平衡)
-   - GPU Utilization: 46% (✅ 合理)
-   - 结论：满足要求且资源平衡
-   ```
+| Config # | CPU Nodes | GPU Nodes | Monthly Cost | Avg Time | Throughput | CPU Utilization | GPU Utilization | Result               |
+| -------- | --------- | --------- | ------------ | -------- | ---------- | --------------- | --------------- | -------------------- |
+| 1        | 1         | 1         | $400         | 35.2s    | 0.25/s     | 98%             | 42%             | ❌ Not meeting        |
+| 2        | 2         | 1         | $500         | 18.5s    | 0.45/s     | 85%             | 46%             | ✅ Meets requirements |
+| 3        | 3         | 1         | $600         | 15.3s    | 0.48/s     | 62%             | 48%             | ✅ Over-provisioned   |
+| 4        | 2         | 2         | $800         | 16.2s    | 0.47/s     | 87%             | 23%             | ⚠️ GPU underutilized |
+| 5        | 1         | 2         | $700         | 32.1s    | 0.28/s     | 96%             | 25%             | ❌ Not meeting        |
 
-3. **测试配置3-5**: 同样步骤
+**Analysis**
 
-### 详细分析
-
-#### 配置1 失败原因
-查看 **Queue Statistics**:
-```
-💻 CPU Compute:
-   Queue: 8-15 (持续高位)
-   Busy: 1/1 (满负荷)
-   Utilization: 98.2% (过载)
-```
-→ CPU成为明显瓶颈
-
-#### 配置2 最优原因
-查看 **Queue Statistics**:
-```
-💻 CPU Compute:
-   Queue: 2-5 (合理范围)
-   Busy: 1-2/2 (动态平衡)
-   Utilization: 85.3% (健康范围)
-   
-🎮 GPU Compute:
-   Queue: 0-2
-   Busy: 0-1/1
-   Utilization: 45.7% (合理)
-```
-→ 两种资源都在健康范围，无明显瓶颈
-
-#### 配置3 过度配置
-查看 **Task Type Statistics**:
-```
-⚡ Resource Efficiency:
-   💡 CPU nodes underutilized
-   ✅ GPU nodes balanced
-```
-→ CPU利用率仅62%，存在资源浪费
-
-### 成本效益对比
-
-| 配置 | 月成本 | 性能 | 成本效益 | 推荐度 |
-|-----|--------|------|---------|--------|
-| 1 | $400 | ❌ | - | ❌ 不可用 |
-| 2 | $500 | ✅ | $1.11/task/s | ⭐⭐⭐⭐⭐ 最优 |
-| 3 | $600 | ✅+ | $1.25/task/s | ⭐⭐⭐ 性能过剩 |
-| 4 | $800 | ✅ | $1.70/task/s | ⭐⭐ GPU浪费 |
-| 5 | $700 | ❌ | - | ❌ 不可用 |
-
-### 结论和建议
-
-**最优配置**: **CPU=2, GPU=1** ($500/月)
-
-**理由**:
-1. ✅ 满足所有性能要求
-2. ✅ 资源利用率平衡（85% CPU, 46% GPU）
-3. ✅ 成本最低
-4. ✅ 有一定扩展余地
-
-**业务建议**:
-- 采用配置2作为基础配置
-- 预计处理 0.45-0.50 tasks/s
-- 月度成本 $500
-- ROI: 如果每个任务收入 > $1.2，则盈利
-
-**弹性扩展策略**:
-- 如流量增长20%，升级到配置3 (CPU=3)
-- 如GPU任务增多，考虑配置4 (GPU=2)
+* Optimal configuration: CPU=2, GPU=1 ($500/month)
+* Balanced utilization: CPU 85%, GPU 46%
+* Under-provisioning fails, over-provisioning wastes cost
 
 ---
 
-## ⭐ 场景3：VIP优先级策略验证
+⭐ Scenario 3: VIP Priority Strategy Verification
 
-### 业务背景
-您的云服务提供三种服务等级：普通用户、个人VIP、企业VIP。需要向客户证明VIP服务的价值。
+**Business Background**
 
-### 目标
-量化VIP用户获得的性能优势，为差异化定价提供数据支持
+Three service levels: Normal, Personal VIP, Enterprise VIP. Show VIP service value.
 
-### 实验设计
+**Objective**
 
-**配置**:
-- CPU Nodes: 2
-- GPU Nodes: 1
-- Mean Arrival Interval: 2.0s
-- CPU Task Probability: 0.7
-- Simulation Time: 3000s (需要足够样本)
+Quantify VIP performance advantage for differential pricing.
 
-### 操作步骤
+**Configuration**
 
-1. **运行仿真**
-   ```
-   设置参数
-   点击 Start
-   等待仿真完成
-   ```
+* CPU Nodes: 2
+* GPU Nodes: 1
+* Mean Arrival Interval: 2.0s
+* CPU Task Probability: 0.7
+* Simulation Time: 3000s
 
-2. **查看 User Type Statistics**
-   ```
-   重点关注：
-   - 各用户类型的完成任务数
-   - 各用户类型的平均系统时间
-   - Priority Effect 百分比
-   ```
+**Results**
 
-### 实验结果
+| User Type      | Completed | Avg System Time |
+| -------------- | --------- | --------------- |
+| NORMAL         | 180 (60%) | 21.45s          |
+| PERSONAL VIP   | 75 (25%)  | 14.23s          |
+| ENTERPRISE VIP | 45 (15%)  | 9.76s           |
 
-#### User Type Statistics 输出:
-```
-👤 NORMAL Users:
-   Completed: 180 (60.0%)
-   Avg System Time: 21.45s
+**Priority Effect**
 
-⭐ PERSONAL VIP:
-   Completed: 75 (25.0%)
-   Avg System Time: 14.23s
+* Enterprise VIP 54.5% faster than Normal
+* Personal VIP 33.7% faster than Normal
 
-⭐⭐ ENTERPRISE VIP:
-   Completed: 45 (15.0%)
-   Avg System Time: 9.76s
+**Conclusion**
 
-📊 Priority Effect:
-   Enterprise VIP is 54.5% faster than Normal
-   Personal VIP is 33.7% faster than Normal
-```
-
-### 详细分析
-
-#### 性能差异对比
-
-| 用户类型 | 平均系统时间 | 相对普通用户 | 服务质量 |
-|---------|-------------|-------------|---------|
-| NORMAL | 21.45s | 基准(100%) | 标准 |
-| PERSONAL VIP | 14.23s | 快33.7% | 良好 ⭐ |
-| ENTERPRISE VIP | 9.76s | 快54.5% | 优秀 ⭐⭐ |
-
-#### 优先级机制验证
-
-查看高负载情况下的表现：
-```
-当CPU队列中同时存在不同类型用户的任务时：
-- 企业VIP任务优先获得服务
-- 个人VIP次之
-- 普通用户最后
-
-结果：
-- VIP用户等待时间显著降低
-- 普通用户等待时间增加
-- 系统总体吞吐量保持不变
-```
-
-### 业务价值分析
-
-#### 定价策略建议
-
-**成本基准**: 假设基础服务 $10/月
-
-| 服务等级 | 性能提升 | 建议定价 | 价格溢价 | 价值主张 |
-|---------|---------|---------|---------|---------|
-| NORMAL | - | $10/月 | - | 标准服务 |
-| PERSONAL VIP | 快34% | $25/月 | 150% | "节省1/3时间" |
-| ENTERPRISE VIP | 快55% | $50/月 | 400% | "响应速度提升一倍" |
-
-#### 营销话术
-
-**给个人VIP客户**:
-```
-"升级到个人VIP，您的任务处理速度将提升33.7%
-平均处理时间从21秒降至14秒
-每天可节省大量等待时间！"
-```
-
-**给企业VIP客户**:
-```
-"企业VIP服务让您的任务优先处理
-平均处理时间仅需9.8秒，比普通用户快54.5%
-关键业务零等待，效率提升一倍！"
-```
-
-### 极端负载测试
-
-**测试**: 将到达间隔降至 1.0s（高负载）
-
-**结果对比**:
-| 用户类型 | 正常负载时间 | 高负载时间 | 时间增长 |
-|---------|------------|-----------|---------|
-| NORMAL | 21.45s | 45.32s | +111% 😰 |
-| PERSONAL VIP | 14.23s | 25.67s | +80% 😐 |
-| ENTERPRISE VIP | 9.76s | 12.84s | +32% 😊 |
-
-**结论**: 高负载时VIP优势更明显！
-
-### 实施建议
-
-1. **向现有客户展示数据**
-   - 生成对比报告
-   - 强调VIP在高峰期的优势
-
-2. **优化定价策略**
-   - 个人VIP: $20-30/月
-   - 企业VIP: $80-100/月
-   - 考虑按需计费模式
-
-3. **SLA承诺**
-   - 普通用户: 平均响应时间 < 25s
-   - 个人VIP: 平均响应时间 < 18s
-   - 企业VIP: 平均响应时间 < 12s
+* VIP tasks prioritized in CPU queues
+* VIP advantage more pronounced under high load
+* Pricing strategy based on performance improvement recommended
 
 ---
 
-## 🚀 场景4：高峰期容量规划
+🚀 Scenario 4: Peak Hour Capacity Planning
 
-### 业务背景
-您的服务在晚上8-10点有流量高峰，需要规划是否需要临时扩容。
+**Business Background**
 
-### 目标
-确定高峰期的资源需求，评估弹性扩容方案
+Traffic surge from 8–10 PM; need temporary scaling assessment.
 
-### 实验设计
+**Recommendation**
 
-**日常配置**:
-- CPU Nodes: 2
-- GPU Nodes: 1
-- 日常到达间隔: 3.0s
-
-**高峰期预期**:
-- 流量增加2倍 → 到达间隔: 1.5s
-- 流量增加3倍 → 到达间隔: 1.0s
-
-### 测试场景
-
-#### 场景A: 高峰期不扩容
-
-**配置**: CPU=2, GPU=1, 到达间隔=1.5s
-
-**结果**:
-```
-Avg System Time: 28.7s (降级)
-Throughput: 0.55/s (接近极限)
-CPU Utilization: 94% (过载边缘)
-Max Queue Length: 18 (拥堵)
-
-Queue Statistics显示:
-💻 CPU Compute:
-   Queue: 10-18 (持续高位)
-   ⚠️ 接近崩溃
-```
-
-**用户体验**: 😰 明显卡顿
-
-#### 场景B: 高峰期扩容1个CPU
-
-**配置**: CPU=3, GPU=1, 到达间隔=1.5s
-
-**结果**:
-```
-Avg System Time: 16.2s (良好)
-Throughput: 0.62/s (提升)
-CPU Utilization: 71% (健康)
-Max Queue Length: 5 (正常)
-
-Queue Statistics显示:
-💻 CPU Compute:
-   Queue: 2-5 (正常范围)
-   ✅ 系统平稳
-```
-
-**用户体验**: 😊 流畅
-
-### 成本效益分析
-
-**扩容成本**:
-```
-临时CPU节点: $100/月
-高峰期时长: 2小时/天 × 30天 = 60小时/月
-实际成本: $100 × (60/720) = $8.33/月
-```
-
-**不扩容的代价**:
-```
-平均响应时间: 28.7s (vs 16.2s)
-额外等待: 12.5s/任务
-高峰期任务数: ~900个/晚
-总浪费时间: 12.5s × 900 × 30 = 337,500秒 = 93.75小时/月
-
-如果用户时间价值$20/小时:
-损失 = 93.75 × $20 = $1,875/月
-```
-
-**决策**: ✅ 强烈建议扩容！ROI = 225倍
-
-### 自动扩容策略
-
-**触发条件**:
-1. CPU利用率 > 85% 持续5分钟
-2. 或平均队列长度 > 10
-
-**扩容动作**:
-- 增加1个CPU节点
-
-**缩容条件**:
-1. CPU利用率 < 40% 持续15分钟
-2. 且队列长度 < 3
-
-**缩容动作**:
-- 减少1个CPU节点
-
-### 实施建议
-
-1. **实施弹性扩容**
-   - 配置自动扩缩容规则
-   - 预热时间: 5分钟
-   - 冷却时间: 15分钟
-
-2. **监控告警**
-   - CPU利用率 > 90%: 紧急告警
-   - 队列长度 > 15: 警告
-   - 平均响应时间 > 25s: 提示
-
-3. **高峰预案**
-   - 提前10分钟预热扩容
-   - 高峰结束后延迟15分钟缩容
-   - 最大扩容到5个CPU节点
+* Automatic scaling based on CPU utilization or queue length
+* High ROI for temporary scaling vs. degraded performance cost
 
 ---
 
-## 🎯 场景5：AI训练vs普通计算混合负载
+🎯 Scenario 5: AI Training vs Normal Computing Mixed Load
 
-### 业务背景
-您的平台同时运行Web应用（CPU密集）和AI训练（GPU密集），需要找到最佳资源配置。
+**Objective**
 
-### 目标
-针对不同任务分布，优化CPU/GPU比例
+Optimize CPU/GPU allocation based on task distribution.
 
-### 实验设计
+| CPU Task Ratio | Recommended Config | Monthly Cost | Scenario      |
+| -------------- | ------------------ | ------------ | ------------- |
+| 90%            | CPU=3, GPU=1       | $600         | Web apps      |
+| 60–85%         | CPU=2, GPU=1       | $500         | Mixed apps    |
+| 30–60%         | CPU=2, GPU=2       | $800         | AI+Web        |
+| <40%           | CPU=2, GPU=2       | $800         | Deep learning |
 
-**测试不同的任务分布**:
-- 场景1: 90% CPU任务 (传统Web应用)
-- 场景2: 70% CPU任务 (混合负载)
-- 场景3: 30% CPU任务 (AI重度使用)
+**Dynamic Adjustment**
 
-**固定参数**:
-- Mean Arrival Interval: 2.0s
-- Simulation Time: 2000s
-
-### 场景1: 传统Web应用 (90% CPU)
-
-**配置测试**:
-
-| CPU | GPU | CPU利用率 | GPU利用率 | 推荐 |
-|-----|-----|-----------|-----------|------|
-| 2 | 1 | 92% | 15% | ⚠️ CPU不足，GPU浪费 |
-| 3 | 1 | 68% | 18% | ✅ 最优 |
-| 4 | 1 | 52% | 19% | 💡 CPU过剩 |
-
-**最优配置**: CPU=3, GPU=1
-
-**Task Type Statistics显示**:
-```
-💻 CPU Tasks:
-   Completed: 270 (90.0%)
-   Node Utilization: 68.3%
-
-🎮 GPU Tasks:
-   Completed: 30 (10.0%)
-   Node Utilization: 18.2%
-
-⚡ Resource Efficiency:
-   ✅ CPU nodes balanced
-   💡 GPU nodes underutilized
-```
-
-### 场景2: 混合负载 (70% CPU)
-
-**配置测试**:
-
-| CPU | GPU | CPU利用率 | GPU利用率 | 推荐 |
-|-----|-----|-----------|-----------|------|
-| 2 | 1 | 85% | 46% | ✅ 平衡 |
-| 2 | 2 | 87% | 24% | 💡 GPU过剩 |
-| 3 | 1 | 62% | 48% | 💡 CPU过剩 |
-
-**最优配置**: CPU=2, GPU=1
-
-**Task Type Statistics显示**:
-```
-💻 CPU Tasks:
-   Completed: 210 (70.0%)
-   Node Utilization: 85.3%
-
-🎮 GPU Tasks:
-   Completed: 90 (30.0%)
-   Node Utilization: 45.7%
-
-⚡ Resource Efficiency:
-   ✅ CPU nodes balanced
-   ✅ GPU nodes balanced
-```
-
-### 场景3: AI重度使用 (30% CPU)
-
-**配置测试**:
-
-| CPU | GPU | CPU利用率 | GPU利用率 | 推荐 |
-|-----|-----|-----------|-----------|------|
-| 2 | 1 | 48% | 91% | ⚠️ GPU不足 |
-| 2 | 2 | 52% | 48% | ✅ 最优 |
-| 1 | 2 | 78% | 52% | ⚠️ CPU稍紧 |
-
-**最优配置**: CPU=2, GPU=2
-
-**Task Type Statistics显示**:
-```
-💻 CPU Tasks:
-   Completed: 90 (30.0%)
-   Node Utilization: 52.1%
-
-🎮 GPU Tasks:
-   Completed: 210 (70.0%)
-   Node Utilization: 47.8%
-
-⚡ Resource Efficiency:
-   ✅ CPU nodes balanced
-   ✅ GPU nodes balanced
-```
-
-### 配置决策矩阵
-
-| CPU任务比例 | 推荐配置 | 月成本 | 适用场景 |
-|-----------|---------|--------|---------|
-| > 85% | CPU=3, GPU=1 | $600 | Web应用、API服务 |
-| 60-85% | CPU=2, GPU=1 | $500 | 混合应用 |
-| 40-60% | CPU=2, GPU=2 | $800 | AI训练+Web |
-| < 40% | CPU=2, GPU=2 | $800 | 深度学习平台 |
-
-### 动态调整策略
-
-**监控指标**:
-1. 每小时统计CPU/GPU任务比例
-2. 观察利用率变化趋势
-
-**调整规则**:
-```
-IF CPU任务比例 > 80% AND CPU利用率 > 85%:
-    增加1个CPU节点
-
-IF GPU任务比例 > 60% AND GPU利用率 > 85%:
-    增加1个GPU节点
-
-IF 某类节点利用率 < 30% 持续2小时:
-    减少该类节点
-```
+* Monitor CPU/GPU ratio and utilization hourly
+* Add/remove nodes based on thresholds
 
 ---
 
-## 📊 场景6：SLA目标达成验证
+📊 Scenario 6: SLA Compliance Verification
 
-### 业务背景
-您的公司承诺客户平均响应时间不超过15秒，需要验证当前配置能否达成目标。
+**Objective**
 
-### 目标
-在不同负载下验证SLA达标率
+Validate SLA compliance under different load levels.
 
-### SLA定义
-```
-服务等级协议(SLA):
-- 普通用户: 平均响应时间 < 20s
-- VIP用户: 平均响应时间 < 15s
-- 可用性: > 99%
-```
+| Load   | Arrival Interval | Config       | Normal Users | VIP Users | SLA Met |
+| ------ | ---------------- | ------------ | ------------ | --------- | ------- |
+| Low    | 4.0s             | 2 CPU, 1 GPU | 10.2s        | 6.8s      | ✅✅      |
+| Medium | 2.5s             | 2 CPU, 1 GPU | 14.5s        | 9.3s      | ✅✅      |
+| High   | 2.0s             | 2 CPU, 1 GPU | 18.7s        | 12.1s     | ✅✅      |
+| Peak   | 1.5s             | 2 CPU, 1 GPU | 24.3s        | 16.2s     | ❌⚠️     |
 
-### 测试矩阵
+**Recommendation**
 
-| 负载等级 | 到达间隔 | 配置 | 普通用户 | VIP用户 | 达标 |
-|---------|---------|------|---------|---------|------|
-| 低 | 4.0s | 2 CPU, 1 GPU | 10.2s | 6.8s | ✅✅ |
-| 中 | 2.5s | 2 CPU, 1 GPU | 14.5s | 9.3s | ✅✅ |
-| 高 | 2.0s | 2 CPU, 1 GPU | 18.7s | 12.1s | ✅✅ |
-| 峰值 | 1.5s | 2 CPU, 1 GPU | 24.3s | 16.2s | ❌⚠️ |
-
-### 问题识别
-
-**峰值负载超标**:
-- 普通用户: 24.3s > 20s (超标21.5%)
-- VIP用户: 16.2s > 15s (超标8%)
-
-### 解决方案测试
-
-#### 方案1: 永久增加1个CPU
-
-**配置**: 3 CPU, 1 GPU, 到达间隔1.5s
-
-**结果**:
-- 普通用户: 15.8s < 20s ✅
-- VIP用户: 10.2s < 15s ✅
-- 额外成本: $100/月
-
-#### 方案2: 峰值时自动扩容
-
-**策略**: 
-- 平时: 2 CPU
-- 峰值: 3 CPU (2小时/天)
-
-**成本**:
-- 扩容成本: $100 × (60/720) = $8.33/月
-- 节省: $91.67/月
-
-**推荐**: ✅ 方案2
+Use temporary scaling to meet SLA at peak load cost-effectively.
 
 ---
 
-## 💡 综合应用：完整项目案例
+💡 Comprehensive Project Example
 
-### 项目背景
-创业公司"CloudFast"需要为新产品设计云计算架构。
+* Client: "CloudFast" startup
+* Users: 10,000
+* Peak concurrency: 500
+* Task distribution: 75% CPU, 25% GPU
+* Service tiers: Standard + VIP
+* Budget: $2,000/month
 
-### 业务需求
-- 预期用户: 10,000
-- 并发高峰: 500用户同时在线
-- 任务分布: 75% CPU, 25% GPU
-- 服务等级: 双层（标准+VIP）
-- 预算限制: $2,000/月
+**Final Configuration**
 
-### 第1步：需求分析
-```
-高峰期任务到达率:
-500用户 × 1任务/2分钟 = 4.17 tasks/分 = 0.07 tasks/s
-
-配置目标到达间隔 = 1 / 0.07 ≈ 14s
-```
-
-### 第2步：基准测试
-```
-初始配置: CPU=2, GPU=1
-到达间隔: 14s
-运行仿真...
-
-结果:
-- Avg System Time: 8.5s ✅
-- Throughput: 0.07/s ✅
-- CPU Utilization: 35% (过低!)
-- GPU Utilization: 22% (过低!)
-```
-
-**结论**: 配置过剩，浪费资源
-
-### 第3步: 优化配置
-```
-尝试: CPU=1, GPU=1
-到达间隔: 14s
-运行仿真...
-
-结果:
-- Avg System Time: 12.3s ✅
-- Throughput: 0.07/s ✅
-- CPU Utilization: 68% ✅
-- GPU Utilization: 24% (仍低)
-- 月成本: $400 (节省$100)
-```
-
-### 第4步: 高峰测试
-```
-模拟流量2倍高峰:
-到达间隔: 7s
-
-结果:
-- Avg System Time: 25.8s ⚠️
-- CPU Utilization: 91% (接近极限)
-```
-
-**决策**: 需要弹性扩容策略
-
-### 最终方案
-
-**基础配置**:
-- 日常: 1 CPU, 1 GPU ($400/月)
-- 峰值: 2 CPU, 1 GPU (自动扩容)
-
-**扩容策略**:
-- 触发: CPU > 85%
-- 动作: +1 CPU
-- 成本: +$8/月
-
-**总成本**: $408/月 (远低于$2,000预算)
-
-**性能保证**:
-- 日常响应时间: 12s
-- 峰值响应时间: 18s
-- 可用性: 99.5%
-
-### 运营监控
-```
-实时监控指标:
-✅ CPU利用率: 60-75%
-✅ GPU利用率: 20-30%
-✅ 平均响应时间: 10-15s
-✅ 99分位响应时间: < 25s
-```
+* Daily: CPU=1, GPU=1 ($400/month)
+* Peak: CPU=2, GPU=1 (automatic scaling)
+* Response time: Daily 12s, Peak 18s
+* Availability: 99.5%
+* Total cost: $408/month
 
 ---
 
-## 🎓 学习路径建议
+🎓 Learning Path
 
-### 初学者
-1. 从场景1开始（容量评估）
-2. 理解负载与性能的关系
-3. 学会识别系统瓶颈
-
-### 中级用户
-1. 尝试场景2（资源优化）
-2. 掌握成本效益分析
-3. 理解场景3（VIP策略）
-
-### 高级用户
-1. 综合运用所有场景
-2. 设计弹性扩缩容策略
-3. 建立完整的容量规划方案
+* Beginner: Scenario 1 (Capacity evaluation)
+* Intermediate: Scenario 2 (Resource optimization), Scenario 3 (VIP strategy)
+* Advanced: Use all scenarios to design flexible scaling and full capacity planning
 
 ---
 
-## 📝 实验记录模板
+📝 Experiment Record Template
 
-```markdown
-## 实验记录
+```
+## Experiment Record
 
-### 实验目标
-[描述您想解决的问题]
+### Objective
+[Describe your goal]
 
-### 配置参数
-- CPU Nodes: 
+### Configuration
+- CPU Nodes:
 - GPU Nodes:
 - Mean Arrival Interval:
 - CPU Task Probability:
 - Simulation Time:
 
-### 实验结果
+### Results
 - Tasks Arrived:
 - Tasks Completed:
 - Avg System Time:
@@ -813,26 +290,25 @@ IF 某类节点利用率 < 30% 持续2小时:
 - GPU Utilization:
 
 ### Queue Statistics
-[粘贴队列统计数据]
+[Paste queue statistics]
 
 ### User Type Statistics
-[粘贴用户类型统计]
+[Paste user type statistics]
 
 ### Task Type Statistics
-[粘贴任务类型统计]
+[Paste task type statistics]
 
-### 分析和结论
-[您的分析]
+### Analysis & Conclusion
+[Your analysis]
 
-### 改进建议
-[下一步优化方向]
+### Improvement Suggestions
+[Next optimization steps]
 ```
 
 ---
 
-## 🎯 下一步
+🎯 Next Steps
 
-回到 **USER_GUIDE.md** 查看详细的界面和参数说明！
+Refer to `USER_GUIDE.md` for detailed interface and parameter instructions.
 
-祝您使用愉快！ 🚀
-
+Happy simulating! 🚀
