@@ -1,91 +1,100 @@
-# 统计面板功能实现说明
+# Statistics Panel Implementation Explanation
 
-## 📋 实现概述
+📋 **Overview**
 
-已成功实现三个统计面板的详细显示功能：
-1. **Queue Statistics (队列统计)**
-2. **User Type Statistics (用户类型统计)**
-3. **Task Type Statistics (任务类型统计)**
+The detailed display functionality of three statistics panels has been successfully implemented:
 
----
+* Queue Statistics
+* User Type Statistics
+* Task Type Statistics
 
-## ✅ 实现的功能
+✅ **Implemented Features**
 
-### 1. Queue Statistics (队列统计)
+1. **Queue Statistics**
 
-显示系统中所有服务点的实时状态：
+Displays the real-time status of all service points in the system:
 
-**📦 Data Storage (数据存储)**
-- 当前队列长度
-- 繁忙服务器数量 / 总服务器数量
-- 历史最大队列长度
-- 服务器利用率 (%)
+📦 **Data Storage**
 
-**🔍 Classification (分类服务)**
-- 当前队列长度
-- 繁忙服务器数量 / 总服务器数量
-- 历史最大队列长度
-- 服务器利用率 (%)
+* Current queue length
+* Busy servers / Total servers
+* Historical maximum queue length
+* Server utilization (%)
 
-**💻 CPU Queue (CPU等待队列)**
-- 当前等待任务数量
-- 历史最大队列长度
+🔍 **Classification Service**
 
-**💻 CPU Compute (CPU计算节点)**
-- 当前队列长度
-- 繁忙节点数 / 总节点数
-- 历史最大队列长度
-- 节点利用率 (%)
-- 已服务任务总数
+* Current queue length
+* Busy servers / Total servers
+* Historical maximum queue length
+* Server utilization (%)
 
-**🎮 GPU Queue (GPU等待队列)**
-- 当前等待任务数量
-- 历史最大队列长度
+💻 **CPU Queue**
 
-**🎮 GPU Compute (GPU计算节点)**
-- 当前队列长度
-- 繁忙节点数 / 总节点数
-- 历史最大队列长度
-- 节点利用率 (%)
-- 已服务任务总数
+* Current waiting tasks
+* Historical maximum queue length
 
-**💾 Result Storage (结果存储)**
-- 当前队列长度
-- 繁忙服务器数量 / 总服务器数量
-- 历史最大队列长度
-- 服务器利用率 (%)
+💻 **CPU Compute**
 
-**作用**：
-- 🔍 识别系统瓶颈（哪个队列最长？哪个服务点利用率最高？）
-- ⚡ 优化资源配置决策
-- 📊 实时监控系统运行状态
+* Current queue length
+* Busy nodes / Total nodes
+* Historical maximum queue length
+* Node utilization (%)
+* Total tasks served
 
----
+🎮 **GPU Queue**
 
-### 2. User Type Statistics (用户类型统计)
+* Current waiting tasks
+* Historical maximum queue length
 
-按用户类型分析任务完成情况和服务质量：
+🎮 **GPU Compute**
 
-**👤 NORMAL Users (普通用户)**
-- 完成任务数量
-- 占比百分比
-- 平均系统时间
+* Current queue length
+* Busy nodes / Total nodes
+* Historical maximum queue length
+* Node utilization (%)
+* Total tasks served
 
-**⭐ PERSONAL VIP (个人VIP)**
-- 完成任务数量
-- 占比百分比
-- 平均系统时间
+💾 **Result Storage**
 
-**⭐⭐ ENTERPRISE VIP (企业VIP)**
-- 完成任务数量
-- 占比百分比
-- 平均系统时间
+* Current queue length
+* Busy servers / Total servers
+* Historical maximum queue length
+* Server utilization (%)
 
-**📊 Priority Effect (优先级效果)**
-- 显示企业VIP相比普通用户的速度提升百分比
-- 验证优先级策略是否有效
+**Purpose:**
 
-**示例输出**：
+* Identify system bottlenecks (which queue is longest? which service point is most utilized?)
+* Optimize resource allocation decisions
+* Monitor system operation in real time
+
+2. **User Type Statistics**
+
+Analyzes task completion and service quality by user type:
+
+👤 **NORMAL Users**
+
+* Completed tasks
+* Percentage
+* Average system time
+
+⭐ **PERSONAL VIP**
+
+* Completed tasks
+* Percentage
+* Average system time
+
+⭐⭐ **ENTERPRISE VIP**
+
+* Completed tasks
+* Percentage
+* Average system time
+
+📊 **Priority Effect**
+
+Shows the speed improvement percentage of Enterprise VIP compared to Normal Users to verify the effectiveness of priority strategy.
+
+**Example Output:**
+
 ```
 👤 NORMAL Users:
    Completed: 150 (50.0%)
@@ -103,35 +112,38 @@
    Enterprise VIP is 52.5% faster
 ```
 
-**作用**：
-- ✅ 验证VIP优先级策略效果
-- 📈 分析不同用户群体的服务质量差异
-- 💰 评估差异化定价策略的合理性
+**Purpose:**
 
----
+* Verify VIP priority strategy
+* Analyze service quality differences among user groups
+* Evaluate the reasonableness of differentiated pricing
 
-### 3. Task Type Statistics (任务类型统计)
+3. **Task Type Statistics**
 
-按任务类型分析处理情况和资源使用：
+Analyzes processing and resource usage by task type:
 
-**💻 CPU Tasks (CPU任务)**
-- 完成任务数量
-- 占比百分比
-- 平均系统时间
-- CPU节点利用率
+💻 **CPU Tasks**
 
-**🎮 GPU Tasks (GPU任务)**
-- 完成任务数量
-- 占比百分比
-- 平均系统时间
-- GPU节点利用率
+* Completed tasks
+* Percentage
+* Average system time
+* CPU node utilization
 
-**⚡ Resource Efficiency (资源效率分析)**
-- ✅ 节点平衡 (30%-90% 利用率)
-- ⚠️ 节点过载 (>90% 利用率) → 建议增加节点
-- 💡 节点闲置 (<30% 利用率) → 建议减少节点或增加负载
+🎮 **GPU Tasks**
 
-**示例输出**：
+* Completed tasks
+* Percentage
+* Average system time
+* GPU node utilization
+
+⚡ **Resource Efficiency Analysis**
+
+* ✅ Balanced nodes (30%-90% utilization)
+* ⚠️ Overloaded nodes (>90% utilization) → Suggest adding nodes
+* 💡 Idle nodes (<30% utilization) → Suggest reducing nodes or increasing load
+
+**Example Output:**
+
 ```
 💻 CPU Tasks:
    Completed: 210 (70.0%)
@@ -148,59 +160,62 @@
    💡 GPU nodes underutilized
 ```
 
-**作用**：
-- 📊 评估CPU/GPU资源使用效率
-- 💰 优化硬件配置和成本
-- 🎯 指导资源调整决策
+**Purpose:**
 
----
+* Evaluate CPU/GPU resource utilization efficiency
+* Optimize hardware configuration and cost
+* Guide resource adjustment decisions
 
-## 🔧 技术实现细节
+🔧 **Technical Implementation Details**
 
-### 新增方法
+**New Methods:**
 
-**1. `updateQueueStatistics()`**
-- 从 `SimulationEngine` 获取所有 `ServicePoint` 对象
-- 读取每个服务点的队列长度、繁忙服务器数、最大队列长度
-- 计算利用率：`Utilization = 总服务时间 / (仿真时间 × 服务器数量)`
-- 格式化输出到 `queueStatsLabel`
+1. **updateQueueStatistics()**
 
-**2. `updateUserTypeStatistics()`**
-- 从 `SimulationResults` 获取各用户类型的完成任务数
-- 调用 `calculateAverageSystemTimeByUserType()` 计算各类型平均系统时间
-- 计算企业VIP相比普通用户的速度提升百分比
-- 格式化输出到 `userTypeStatsLabel`
+* Retrieve all ServicePoint objects from SimulationEngine
+* Read queue length, busy servers, and maximum queue length for each service point
+* Calculate utilization: `Utilization = Total Service Time / (Simulation Time × Number of Servers)`
+* Format output to `queueStatsLabel`
 
-**3. `updateTaskTypeStatistics()`**
-- 从 `SimulationResults` 获取各任务类型的完成任务数
-- 调用 `calculateAverageSystemTimeByTaskType()` 计算各类型平均系统时间
-- 获取CPU/GPU节点的利用率
-- 分析资源效率并给出建议
-- 格式化输出到 `taskTypeStatsLabel`
+2. **updateUserTypeStatistics()**
 
-**4. `calculateAverageSystemTimeByUserType()`**
-- 遍历所有已完成任务
-- 按用户类型分组累加系统时间
-- 计算每个用户类型的平均系统时间
-- 返回 `Map<UserType, Double>`
+* Retrieve completed task count by user type from SimulationResults
+* Call `calculateAverageSystemTimeByUserType()` to compute average system time by user type
+* Calculate Enterprise VIP speed improvement compared to Normal Users
+* Format output to `userTypeStatsLabel`
 
-**5. `calculateAverageSystemTimeByTaskType()`**
-- 遍历所有已完成任务
-- 按任务类型分组累加系统时间
-- 计算每个任务类型的平均系统时间
-- 返回 `Map<TaskType, Double>`
+3. **updateTaskTypeStatistics()**
 
----
+* Retrieve completed task count by task type from SimulationResults
+* Call `calculateAverageSystemTimeByTaskType()` to compute average system time by task type
+* Obtain CPU/GPU node utilization
+* Analyze resource efficiency and provide suggestions
+* Format output to `taskTypeStatsLabel`
 
-## 📊 数据更新机制
+4. **calculateAverageSystemTimeByUserType()**
 
-所有统计信息在以下情况自动更新：
+* Traverse all completed tasks
+* Group and sum system time by user type
+* Calculate average system time per user type
+* Return `Map<UserType, Double>`
 
-1. **仿真运行时**：每隔 100ms 更新一次（由 `UPDATE_INTERVAL_MS` 控制）
-2. **仿真完成时**：最终更新显示准确的统计结果
-3. **点击 Reset 时**：清空统计显示
+5. **calculateAverageSystemTimeByTaskType()**
 
-更新流程：
+* Traverse all completed tasks
+* Group and sum system time by task type
+* Calculate average system time per task type
+* Return `Map<TaskType, Double>`
+
+📊 **Data Update Mechanism**
+
+All statistics are updated automatically in the following cases:
+
+* During simulation: updated every 100ms (controlled by `UPDATE_INTERVAL_MS`)
+* Simulation complete: final update shows accurate results
+* On Reset click: clears displayed statistics
+
+**Update Flow:**
+
 ```
 SimulationEngine.onSimulationUpdate()
     ↓
@@ -211,13 +226,12 @@ SimulationController.updateStatistics()
     └── updateTaskTypeStatistics()
 ```
 
----
+🎯 **Usage Examples**
 
-## 🎯 使用示例
+**Scenario 1: Identify System Bottlenecks**
 
-### 场景1：识别系统瓶颈
+Observation:
 
-**观察**：运行仿真后发现
 ```
 💻 CPU Compute:
    Queue: 15 | Busy: 2/2 | Max: 28
@@ -228,19 +242,20 @@ SimulationController.updateStatistics()
    Utilization: 35.2% | Served: 60
 ```
 
-**分析**：
-- CPU节点利用率95.3%，队列长达15个任务 → CPU是瓶颈
-- GPU节点利用率35.2%，队列很短 → GPU资源闲置
+Analysis:
 
-**建议**：
-- 增加CPU节点数量（从2增加到3或4）
-- 或者调整任务分布（降低CPU任务概率）
+* CPU node utilization 95.3%, queue length 15 → CPU is bottleneck
+* GPU node utilization 35.2%, short queue → GPU resources idle
 
----
+Suggestion:
 
-### 场景2：验证VIP优先级
+* Increase CPU nodes (from 2 to 3 or 4)
+* Or adjust task distribution (reduce CPU task probability)
 
-**观察**：运行仿真后发现
+**Scenario 2: Verify VIP Priority**
+
+Observation:
+
 ```
 👤 NORMAL Users:
    Avg System Time: 18.76s
@@ -252,73 +267,62 @@ SimulationController.updateStatistics()
    Enterprise VIP is 56.1% faster
 ```
 
-**分析**：
-- 企业VIP用户的平均系统时间比普通用户少56.1%
-- 优先级策略有效工作
+Analysis:
 
-**结论**：
-- 可以向VIP客户证明其享受的服务优势
-- 支持差异化定价策略
+* Enterprise VIP users’ average system time is 56.1% shorter than Normal Users
+* Priority strategy works effectively
 
----
+Conclusion:
 
-### 场景3：优化资源配置
+* Demonstrates VIP service advantages
+* Supports differentiated pricing strategy
 
-**实验设置**：
-- 到达间隔：2.0s
-- CPU任务概率：0.7
+**Scenario 3: Optimize Resource Allocation**
 
-**测试不同配置**：
+Experiment settings:
 
-| CPU节点 | GPU节点 | CPU利用率 | GPU利用率 | 平均系统时间 | 建议 |
-|---------|---------|-----------|-----------|-------------|------|
-| 1 | 1 | 98.5% | 42.3% | 35.2s | CPU过载 ⚠️ |
-| 2 | 1 | 85.3% | 45.7% | 18.5s | 平衡 ✅ |
-| 3 | 1 | 62.1% | 48.2% | 15.8s | CPU闲置 💡 |
-| 2 | 2 | 87.2% | 23.1% | 17.9s | GPU闲置 💡 |
+* Arrival interval: 2.0s
+* CPU task probability: 0.7
 
-**结论**：CPU=2, GPU=1 是最优配置（平衡性能和成本）
+Test different configurations:
 
----
+| CPU Nodes | GPU Nodes | CPU Utilization | GPU Utilization | Avg System Time | Suggestion        |
+| --------- | --------- | --------------- | --------------- | --------------- | ----------------- |
+| 1         | 1         | 98.5%           | 42.3%           | 35.2s           | CPU Overloaded ⚠️ |
+| 2         | 1         | 85.3%           | 45.7%           | 18.5s           | Balanced ✅        |
+| 3         | 1         | 62.1%           | 48.2%           | 15.8s           | CPU Idle 💡       |
+| 2         | 2         | 87.2%           | 23.1%           | 17.9s           | GPU Idle 💡       |
 
-## 🚀 后续优化建议
+Conclusion: CPU=2, GPU=1 is optimal (balance performance and cost)
 
-可以进一步增强的功能：
+🚀 **Further Optimization Suggestions**
 
-1. **历史趋势图表**：使用 JavaFX Chart API 绘制时间序列图
-2. **导出统计报告**：将统计数据导出为 CSV 或 PDF
-3. **实时告警**：当某个队列长度或利用率超过阈值时发出警告
-4. **对比分析**：同时显示多次仿真结果的对比
-5. **更多指标**：添加响应时间分布、队列等待时间分布等
+* Historical trend charts: use JavaFX Chart API to draw time series
+* Export statistics reports: CSV or PDF
+* Real-time alerts: notify when queue length or utilization exceeds thresholds
+* Comparative analysis: display multiple simulation results for comparison
+* Additional metrics: add response time distribution, queue waiting time distribution, etc.
 
----
+✅ **Validation Checklist**
 
-## ✅ 验证清单
+* Compiled successfully: ✅ `mvn clean compile`
 
-编译成功：✅
-```
-mvn clean compile
-[INFO] BUILD SUCCESS
-```
+Implemented features:
 
-已实现的功能：
-- ✅ Queue Statistics 显示
-- ✅ User Type Statistics 显示
-- ✅ Task Type Statistics 显示
-- ✅ 实时数据更新
-- ✅ 格式化显示输出
-- ✅ 资源效率分析
-- ✅ 优先级效果验证
+* ✅ Queue Statistics display
+* ✅ User Type Statistics display
+* ✅ Task Type Statistics display
+* ✅ Real-time data update
+* ✅ Formatted output
+* ✅ Resource efficiency analysis
+* ✅ Priority effect verification
 
----
+📝 **Usage Instructions**
 
-## 📝 使用说明
+* Launch application: `mvn javafx:run`
+* Configure parameters: set simulation parameters in the bottom panel
+* Start simulation: click ▶️ Start button
+* Observe statistics: right panel displays three detailed statistics bars in real time
+* Analyze results: optimize system configuration based on statistics
 
-1. **启动应用**：`mvn javafx:run`
-2. **配置参数**：在底部面板设置仿真参数
-3. **开始仿真**：点击 ▶️ Start 按钮
-4. **观察统计**：右侧面板会实时显示三个统计栏的详细信息
-5. **分析结果**：根据统计数据优化系统配置
-
-现在您可以在仿真运行时看到完整的统计信息了！🎉
-
+You can now see complete statistics in real time during simulation! 🎉
