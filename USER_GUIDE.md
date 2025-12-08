@@ -1,583 +1,405 @@
-# 用户使用指南 (User Guide)
+User Guide
 
-## 📋 文档说明
+📋 Documentation Description
 
-本指南详细介绍云计算服务队列仿真系统的界面元素、参数含义和使用方法。
+This guide provides detailed explanations of the cloud computing service queue simulation system, including interface elements, parameter meanings, and usage instructions.
 
-**相关文档**：
-- **SCENARIO_GUIDE.md** - 场景化应用案例指南
-- **STATISTICS_IMPLEMENTATION.md** - 技术实现细节（开发者参考）
+Related Documents:
 
----
+SCENARIO_GUIDE.md - Scenario-based application examples guide
 
-## 📊 界面布局概览
+STATISTICS_IMPLEMENTATION.md - Technical implementation details (for developers)
 
-### 顶部控制面板
-- ▶️ Start / ⏸ Pause / ▶️ Resume / ⏹ Stop / 🔄 Reset 按钮
-- ⏱ 仿真时间显示
-- 🚀 速度控制滑块（0.1x - 100x）
+📊 Interface Layout Overview
 
-### 中央可视化区域
-- 系统流程可视化画布
-- 实时显示任务流动和服务点状态
+Top Control Panel
 
-### 右侧统计面板
-- Overall Statistics (总体统计)
-- Queue Statistics (队列统计)
-- User Type Statistics (用户类型统计)
-- Task Type Statistics (任务类型统计)
+▶️ Start / ⏸ Pause / ▶️ Resume / ⏹ Stop / 🔄 Reset Buttons
 
-### 底部配置面板
-- 仿真参数配置
-- 数据库连接状态
-- 配置保存/加载功能
-- 历史仿真记录表
+⏱ Simulation Time Display
 
----
+🚀 Speed Control Slider (0.1x - 100x)
 
-## 📊 右侧统计面板详细说明
+Central Visualization Area
 
-### 1. Overall Statistics (总体统计)
+System process visualization canvas
 
-#### **Tasks Arrived (到达任务数)**
-**含义**: 系统中已到达的任务总数
+Real-time display of task flow and service point status
 
-**作用**: 监控系统负载，了解有多少任务进入系统
+Right Statistics Panel
 
----
+Overall Statistics
 
-#### **Tasks Completed (完成任务数)**
-**含义**: 系统已完成处理的任务总数
+Queue Statistics
 
-**作用**: 
-- 与到达任务数对比，了解系统处理进度
-- 如果完成数远小于到达数，说明系统存在积压
+User Type Statistics
 
----
+Task Type Statistics
 
-#### **Avg System Time (平均系统时间)**
-**含义**: 每个任务从到达系统到完成服务所经历的平均总时间（单位：秒）
+Bottom Configuration Panel
 
-**计算公式**:
-```
-平均系统时间 = 所有已完成任务的系统时间总和 ÷ 已完成任务数量
-```
+Simulation parameter configuration
 
-**系统时间包括**:
-- 在各个队列中的等待时间
-- 在各个服务点的服务时间
-- 整个流程的总耗时
+Database connection status
 
-**作用**:
-- 衡量系统的响应速度
-- 越小说明系统处理速度越快，用户体验越好
-- 如果这个值过大，说明系统可能存在瓶颈（队列太长、服务器不够等）
+Configuration save/load functionality
 
-**示例解读**:
-- `15.30s` → 平均每个任务需要15.3秒完成
-- `2.50s` → 平均每个任务需要2.5秒完成（系统效率高）
-- `45.00s` → 平均每个任务需要45秒完成（系统可能过载）
+Historical simulation records table
 
----
+📊 Right Statistics Panel Detailed Description
 
-#### **Throughput (吞吐量)**
-**含义**: 系统每秒钟完成的任务数量（单位：任务/秒）
+1. Overall Statistics
 
-**计算公式**:
-```
-吞吐量 = 已完成任务总数 ÷ 仿真运行时间
-```
+Tasks Arrived
 
-**作用**:
-- 衡量系统的处理能力
-- 越大说明系统在单位时间内处理的任务越多，性能越好
-- 这是评估云计算服务容量的关键指标
+Meaning: Total number of tasks that have arrived in the system
 
-**示例解读**:
-- `0.500/s` → 每秒完成0.5个任务（每2秒完成1个任务）
-- `2.000/s` → 每秒完成2个任务
-- `0.050/s` → 每秒完成0.05个任务（每20秒完成1个任务，系统效率很低）
+Purpose: Monitor system load and understand how many tasks have entered the system
 
-**影响因素**:
-- CPU/GPU节点数量（服务器越多，吞吐量越大）
-- 任务到达频率
-- 各服务点的处理速度
-- 队列管理策略
-
----
-
-### 2. Queue Statistics (队列统计)
-
-**含义**: 实时显示系统中所有服务点的队列状态和利用率
-
-**显示内容**:
-
-#### 📦 Data Storage (数据存储)
-- **Queue**: 当前队列中等待的任务数量
-- **Busy**: 繁忙服务器数 / 总服务器数 (1个服务器)
-- **Max**: 仿真过程中队列的最大长度
-- **Utilization**: 服务器利用率百分比
-
-#### 🔍 Classification (分类服务)
-- **Queue**: 当前队列中等待的任务数量
-- **Busy**: 繁忙服务器数 / 总服务器数 (1个服务器)
-- **Max**: 仿真过程中队列的最大长度
-- **Utilization**: 服务器利用率百分比
-
-#### 💻 CPU Queue (CPU等待队列)
-- **Waiting**: 当前等待分配到CPU节点的任务数量
-- **Max**: 等待队列的历史最大长度
-
-#### 💻 CPU Compute (CPU计算节点)
-- **Queue**: 当前队列中的任务数量
-- **Busy**: 繁忙节点数 / 总节点数（根据配置）
-- **Max**: 队列的历史最大长度
-- **Utilization**: CPU节点利用率百分比
-- **Served**: 已服务完成的任务总数
-
-#### 🎮 GPU Queue (GPU等待队列)
-- **Waiting**: 当前等待分配到GPU节点的任务数量
-- **Max**: 等待队列的历史最大长度
-
-#### 🎮 GPU Compute (GPU计算节点)
-- **Queue**: 当前队列中的任务数量
-- **Busy**: 繁忙节点数 / 总节点数（根据配置）
-- **Max**: 队列的历史最大长度
-- **Utilization**: GPU节点利用率百分比
-- **Served**: 已服务完成的任务总数
-
-#### 💾 Result Storage (结果存储)
-- **Queue**: 当前队列中等待的任务数量
-- **Busy**: 繁忙服务器数 / 总服务器数 (1个服务器)
-- **Max**: 仿真过程中队列的最大长度
-- **Utilization**: 服务器利用率百分比
-
-**作用**:
-- 🔍 **识别瓶颈**: 哪个队列最长？哪个服务点利用率最高？
-- ⚡ **优化资源**: 根据利用率决定是否需要增加/减少服务器
-- 📊 **实时监控**: 观察系统运行状态，发现异常
-
-**利用率解读**:
-- `< 30%` → 💡 资源闲置，可能配置过多
-- `30% - 90%` → ✅ 资源利用良好，系统平衡
-- `> 90%` → ⚠️ 资源过载，建议增加服务器
-
----
-
-### 3. User Type Statistics (用户类型统计)
-
-**含义**: 按用户类型分析任务完成情况和服务质量
-
-**用户类型说明**:
-1. **👤 NORMAL (普通用户)** - 优先级最低
-2. **⭐ PERSONAL_VIP (个人VIP)** - 优先级中等
-3. **⭐⭐ ENTERPRISE_VIP (企业VIP)** - 优先级最高
-
-**显示内容**:
-
-#### 👤 NORMAL Users
-- **Completed**: 完成的任务数量
-- **百分比**: 占总完成任务的比例
-- **Avg System Time**: 该类型用户的平均系统时间
-
-#### ⭐ PERSONAL VIP
-- **Completed**: 完成的任务数量
-- **百分比**: 占总完成任务的比例
-- **Avg System Time**: 该类型用户的平均系统时间
-
-#### ⭐⭐ ENTERPRISE VIP
-- **Completed**: 完成的任务数量
-- **百分比**: 占总完成任务的比例
-- **Avg System Time**: 该类型用户的平均系统时间
-
-#### 📊 Priority Effect (优先级效果)
-- 显示企业VIP相比普通用户的速度提升百分比
-- 验证优先级策略是否有效
-
-**作用**:
-- ✅ 验证VIP优先级策略效果
-- 📈 分析不同用户群体的服务质量差异
-- 💰 评估差异化定价策略的合理性
-- 🎯 向客户展示VIP服务的价值
-
-**示例输出**:
-```
-👤 NORMAL Users:
-   Completed: 150 (50.0%)
-   Avg System Time: 18.45s
-
-⭐ PERSONAL VIP:
-   Completed: 90 (30.0%)
-   Avg System Time: 12.23s
-
-⭐⭐ ENTERPRISE VIP:
-   Completed: 60 (20.0%)
-   Avg System Time: 8.76s
-
-📊 Priority Effect:
-   Enterprise VIP is 52.5% faster
-```
-
----
-
-### 4. Task Type Statistics (任务类型统计)
-
-**含义**: 按任务类型分析处理情况和资源使用
-
-**任务类型说明**:
-1. **💻 CPU Tasks** - 需要CPU节点处理的计算任务
-2. **🎮 GPU Tasks** - 需要GPU节点处理的图形/深度学习任务
-
-**显示内容**:
-
-#### 💻 CPU Tasks
-- **Completed**: 完成的CPU任务数量
-- **百分比**: 占总完成任务的比例
-- **Avg System Time**: CPU任务的平均系统时间
-- **Node Utilization**: CPU节点的利用率百分比
-
-#### 🎮 GPU Tasks
-- **Completed**: 完成的GPU任务数量
-- **百分比**: 占总完成任务的比例
-- **Avg System Time**: GPU任务的平均系统时间
-- **Node Utilization**: GPU节点的利用率百分比
-
-#### ⚡ Resource Efficiency (资源效率分析)
-自动分析资源使用效率并给出建议：
-- ✅ **节点平衡** (30%-90% 利用率) - 资源配置合理
-- ⚠️ **节点过载** (>90% 利用率) - 建议增加节点数量
-- 💡 **节点闲置** (<30% 利用率) - 建议减少节点或增加负载
-
-**作用**:
-- 📊 评估CPU/GPU资源使用效率
-- 💰 优化硬件配置和成本
-- 🎯 指导资源调整决策
-- 📈 平衡不同类型任务的处理能力
-
-**示例输出**:
-```
-💻 CPU Tasks:
-   Completed: 210 (70.0%)
-   Avg System Time: 15.23s
-   Node Utilization: 85.3%
-
-🎮 GPU Tasks:
-   Completed: 90 (30.0%)
-   Avg System Time: 16.45s
-   Node Utilization: 45.7%
+Tasks Completed
 
-⚡ Resource Efficiency:
-   ✅ CPU nodes balanced
-   💡 GPU nodes underutilized
-```
+Meaning: Total number of tasks completed by the system
 
----
-
-## ⚙️ 底部配置面板详细说明
+Purpose: Compare with tasks arrived to understand system processing progress
 
-### Mean Arrival Interval (平均到达间隔)
+If completed tasks are much fewer than arrived tasks, the system may have backlog
 
-**范围**: 通常 0.1 - 10.0 秒
+Avg System Time
 
-**含义**: 任务到达系统的平均时间间隔
+Meaning: Average total time each task spends from arrival to completion (seconds)
 
-**调整效果**:
-- **减小** (例如 2.0 → 0.5)
-  - 任务到达更频繁
-  - 系统负载增加
-  - 队列会变长
-  - 平均系统时间会增加
-  - 可能观察到系统过载现象
-  
-- **增大** (例如 2.0 → 5.0)
-  - 任务到达更稀疏
-  - 系统负载降低
-  - 队列较短或为空
-  - 平均系统时间减少
-  - 服务器可能闲置
-
-**实际意义**: 模拟不同时段的用户访问量（高峰期 vs 低谷期）
-
-**建议值**: 
-- 高负载测试：0.5 - 1.0s
-- 正常负载：1.5 - 3.0s
-- 轻负载：4.0 - 10.0s
-
----
-
-### Simulation Time (仿真时间)
+Formula:
 
-**范围**: 100 - 10000 秒
+Average System Time = Total system time of all completed tasks ÷ Number of completed tasks
 
-**含义**: 仿真运行的总时长
+System time includes:
 
-**调整效果**:
-- **短时间** (例如 100s)
-  - 快速获得结果
-  - 但可能样本不足，统计不稳定
-  
-- **长时间** (例如 5000s)
-  - 更准确的统计结果
-  - 可以观察系统的长期行为
-  - 但运行时间更长
+Waiting time in all queues
 
-**实际意义**: 平衡仿真精度和运行时间
+Service time at each service point
 
-**建议值**:
-- 快速测试：100 - 500s
-- 标准仿真：1000 - 2000s
-- 详细分析：3000 - 5000s
+Total process duration
 
----
+Purpose:
 
-### CPU Nodes (CPU节点数)
+Measure system response speed
 
-**范围**: 通常 1 - 10
+Smaller values indicate faster system processing and better user experience
 
-**含义**: 系统中CPU服务器的数量
+Larger values may indicate system bottlenecks (long queues, insufficient servers)
 
-**调整效果**:
-- **增加** (例如 2 → 4)
-  - CPU任务处理能力提升
-  - CPU队列等待时间减少
-  - 整体吞吐量增加（如果CPU是瓶颈）
-  - 但增加硬件成本
-  
-- **减少** (例如 2 → 1)
-  - CPU任务处理能力下降
-  - CPU队列变长
-  - 可能成为系统瓶颈
+Example:
 
-**实际意义**: 评估硬件投资（增加服务器）对性能提升的效果
+15.30s → Average task completion time 15.3 seconds
 
-**建议**:
-- 观察CPU Compute的利用率
-- 如果 >90%，考虑增加节点
-- 如果 <30%，考虑减少节点
+2.50s → Average task completion time 2.5 seconds (high efficiency)
 
----
+45.00s → Average task completion time 45 seconds (possible overload)
 
-### GPU Nodes (GPU节点数)
+Throughput
 
-**范围**: 通常 1 - 5
+Meaning: Number of tasks completed per second (tasks/sec)
 
-**含义**: 系统中GPU服务器的数量
+Formula:
 
-**调整效果**: 与CPU Nodes类似，但针对GPU任务
+Throughput = Total completed tasks ÷ Simulation run time
 
-**实际意义**: 
-- GPU硬件成本通常更高
-- 需要更谨慎地评估配置需求
+Purpose:
 
-**建议**:
-- 观察GPU Compute的利用率
-- 根据GPU任务比例调整
-- 考虑成本-性能平衡
+Measure system processing capacity
 
----
+Higher value indicates more tasks processed per unit time
 
-### CPU Task Probability (CPU任务概率)
+Example:
 
-**范围**: 0.0 - 1.0（例如 0.7 = 70%）
+0.500/s → 0.5 tasks per second (1 task every 2s)
 
-**含义**: 新到达任务是CPU任务的概率
+2.000/s → 2 tasks per second
 
-**调整效果**:
-- **0.7** = 70% CPU任务，30% GPU任务
-- **0.9** = 90% CPU任务，10% GPU任务
-  - CPU队列压力大
-  - GPU资源可能闲置
-  - 需要更多CPU节点
-  
-- **0.3** = 30% CPU任务，70% GPU任务
-  - GPU队列压力大
-  - CPU资源可能闲置
-  - 需要更多GPU节点
+0.050/s → 0.05 tasks per second (1 task every 20s, low efficiency)
 
-**实际意义**: 
-- 模拟不同应用场景的任务分布
-- 普通Web服务：高CPU概率 (0.8-0.9)
-- AI/机器学习：低CPU概率 (0.2-0.4)
-- 混合场景：中等概率 (0.5-0.7)
-
-**建议**:
-- 根据实际业务场景设置
-- 观察两种资源的利用率平衡
-
----
-
-### Database连接和功能
-
-#### Database Status (数据库状态)
-
-**显示内容**:
-- ✅ **Connected** - 数据库连接成功
-- ❌ **Not Connected** - 数据库未连接
-
-#### Test 按钮
-
-**功能**: 测试数据库连接
-
-**点击后的效果**:
-1. 尝试连接到MariaDB数据库
-2. 测试数据库中的表是否存在
-3. 更新连接状态标签
-
-**成功时**:
-- 标签变为：`✅ Connected` (绿色)
-- 弹出信息框：`Database connection successful!`
-- 可以使用数据库功能
-
-**失败时**:
-- 标签保持：`❌ Not Connected` (红色)
-- 弹出错误框：显示具体错误信息
-- 数据库相关功能不可用
-
-#### 数据库功能（需要连接成功）
-
-**💾 Save Config (保存配置)**
-- 将当前仿真配置保存到数据库
-- 可以为配置命名
-- 方便后续重复使用
-
-**📁 Load Config (加载配置)**
-- 从数据库加载已保存的配置
-- 选择配置名称
-- 自动填充所有参数
-
-**📊 View History (查看历史)**
-- 在底部表格中显示历史仿真记录
-- 包含运行时间、完成任务数、吞吐量等
-- 可以对比不同配置的效果
-
----
-
-## 🎮 控制按钮说明
-
-### ▶️ Start (开始)
-- 使用当前配置开始新的仿真
-- 初始化所有统计数据
-- 创建数据库记录（如果连接）
-
-### ⏸ Pause (暂停)
-- 暂停仿真运行
-- 保持当前状态
-- 可以观察统计数据
-
-### ▶️ Resume (继续)
-- 从暂停状态继续运行
-- 保持之前的统计数据
-
-### ⏹ Stop (停止)
-- 停止仿真运行
-- 保存结果到数据库（如果连接）
-- 显示最终统计结果
-
-### 🔄 Reset (重置)
-- 重置仿真到初始状态
-- 清空所有统计数据
-- 保持当前配置参数
+Factors affecting throughput:
 
-### 🚀 Speed Control (速度控制)
-- 滑块范围：0.1x - 100x
-- 调整仿真运行速度
-- 1x = 实时速度
-- 100x = 快速仿真（用于快速获得结果）
-- 0.1x = 慢速仿真（用于详细观察）
+Number of CPU/GPU nodes
 
----
+Task arrival rate
 
-## 📝 基本使用流程
+Processing speed of service points
 
-### 1. 配置参数
-1. 在底部面板设置仿真参数：
-   - Mean Arrival Interval
-   - Simulation Time
-   - CPU/GPU Nodes
-   - CPU Task Probability
+Queue management strategy
 
-### 2. 开始仿真
-1. 点击 ▶️ Start 按钮
-2. 观察中央可视化区域的动画
-3. 观察右侧统计面板的实时数据
+2. Queue Statistics
 
-### 3. 控制仿真
-- 使用 ⏸ Pause 暂停观察
-- 使用 ▶️ Resume 继续
-- 调整 🚀 Speed 控制速度
+Meaning: Real-time display of queue status and utilization at all service points
 
-### 4. 分析结果
-1. 查看 Overall Statistics - 了解整体性能
-2. 查看 Queue Statistics - 识别瓶颈
-3. 查看 User Type Statistics - 验证优先级策略
-4. 查看 Task Type Statistics - 评估资源使用
+Displays:
 
-### 5. 优化配置
-1. 根据统计结果调整参数
-2. 重新运行仿真
-3. 对比不同配置的效果
+📦 Data Storage
 
-### 6. 保存结果（可选）
-1. 确保数据库连接
-2. 使用 💾 Save Config 保存优秀配置
-3. 查看 📊 History 对比历史数据
+Queue: Current number of waiting tasks
 
----
+Busy: Number of busy servers / total servers (1 server)
 
-## 💡 使用技巧
+Max: Maximum queue length during simulation
 
-### 快速测试
-1. 设置较短的 Simulation Time (100-500s)
-2. 提高 Speed 到 10x - 50x
-3. 快速获得初步结果
+Utilization: Server utilization percentage
 
-### 详细分析
-1. 设置较长的 Simulation Time (2000-5000s)
-2. 使用正常 Speed (1x - 5x)
-3. 仔细观察各项指标变化
+🔍 Classification Service
 
-### 识别瓶颈
-1. 运行仿真
-2. 观察 Queue Statistics
-3. 找到利用率 >90% 或队列最长的服务点
-4. 调整相应资源配置
+Queue, Busy, Max, Utilization same as above
 
-### 参数优化
-1. **每次只改变一个参数**
-2. 记录每次的关键指标
-3. 对比找出最优配置
-4. 使用 Save Config 保存
+💻 CPU Queue
 
-### 对比实验
-1. 保存多个不同配置
-2. 依次运行
-3. 记录关键指标
-4. 制作对比表格
+Waiting: Tasks waiting for CPU node assignment
 
----
+Max: Historical max waiting queue length
 
-## ⚠️ 常见问题
+💻 CPU Compute
 
-### Q1: 统计面板没有数据？
-**A**: 需要点击 Start 开始仿真后才会有数据更新
+Queue: Tasks in CPU queue
 
-### Q2: 数据库连接失败？
-**A**: 检查 `database.properties` 文件，确保用户名密码正确，MariaDB服务正在运行
+Busy: Busy nodes / total nodes
 
-### Q3: 仿真运行很慢？
-**A**: 调高 Speed 滑块，或者减少 Simulation Time
+Max: Historical max queue length
 
-### Q4: 如何判断系统性能好坏？
-**A**: 主要看两个指标：
-- Avg System Time - 越小越好
-- Throughput - 越大越好
+Utilization: CPU node utilization %
 
-### Q5: 利用率多少算合理？
-**A**: 30%-90% 为合理范围，>90% 过载，<30% 浪费
+Served: Total tasks completed
 
----
+🎮 GPU Queue
 
-## 🎯 下一步
+Waiting: Tasks waiting for GPU node assignment
 
-查看 **SCENARIO_GUIDE.md** 了解具体应用场景和实战案例！
+Max: Historical max waiting queue length
 
+🎮 GPU Compute
+
+Queue, Busy, Max, Utilization same as CPU Compute
+
+Served: Total tasks completed
+
+💾 Result Storage
+
+Queue, Busy, Max, Utilization same as above
+
+Purpose:
+
+Identify bottlenecks
+
+Optimize resources
+
+Monitor system in real-time
+
+Utilization interpretation:
+
+< 30% → 💡 Resources idle
+
+30%-90% → ✅ Good utilization, system balanced
+
+> 90% → ⚠️ Overloaded, consider adding servers
+
+3. User Type Statistics
+
+Meaning: Analyze task completion and service quality by user type
+
+User types:
+
+👤 NORMAL - lowest priority
+
+⭐ PERSONAL_VIP - medium priority
+
+⭐⭐ ENTERPRISE_VIP - highest priority
+
+Displays:
+
+Completed: Tasks completed
+
+Percentage: % of total completed tasks
+
+Avg System Time: Average system time for user type
+
+Priority Effect:
+
+Shows speed improvement for Enterprise VIP vs Normal Users
+
+Purpose:
+
+Verify VIP priority effectiveness
+
+Analyze service quality differences between user groups
+
+Assess differentiated pricing strategy
+
+Example:
+
+👤 NORMAL Users: Completed: 150 (50%), Avg System Time: 18.45s
+
+⭐ PERSONAL VIP: Completed: 90 (30%), Avg System Time: 12.23s
+
+⭐⭐ ENTERPRISE VIP: Completed: 60 (20%), Avg System Time: 8.76s
+
+Priority Effect: Enterprise VIP is 52.5% faster
+
+4. Task Type Statistics
+
+Meaning: Analyze processing and resource usage by task type
+
+Task types:
+
+💻 CPU Tasks - computation tasks requiring CPU
+
+🎮 GPU Tasks - graphics/deep learning tasks requiring GPU
+
+Displays:
+
+💻 CPU Tasks
+
+Completed, Percentage, Avg System Time, Node Utilization
+
+🎮 GPU Tasks
+
+Completed, Percentage, Avg System Time, Node Utilization
+
+Resource Efficiency:
+
+✅ Balanced nodes (30%-90% utilization)
+
+⚠️ Overloaded nodes (>90% utilization) - consider adding nodes
+
+💡 Idle nodes (<30% utilization) - consider reducing nodes or increasing load
+
+Purpose:
+
+Evaluate CPU/GPU resource efficiency
+
+Optimize hardware cost
+
+Guide resource adjustment
+
+Example:
+
+💻 CPU Tasks: Completed: 210 (70%), Avg System Time: 15.23s, Node Utilization: 85.3%
+
+🎮 GPU Tasks: Completed: 90 (30%), Avg System Time: 16.45s, Node Utilization: 45.7%
+
+Resource Efficiency: ✅ CPU nodes balanced, 💡 GPU nodes underutilized
+
+⚙️ Bottom Configuration Panel
+
+Mean Arrival Interval
+
+Range: 0.1 - 10.0s
+
+Meaning: Average time interval between task arrivals
+
+Effect:
+
+Decrease → Tasks arrive more frequently, system load increases, queues longer
+
+Increase → Tasks arrive less frequently, system load decreases, queues shorter
+
+Simulation Time
+
+Range: 100 - 10000s
+
+Meaning: Total simulation duration
+
+Effect:
+
+Short → Quick results, but unstable statistics
+
+Long → More accurate statistics, observe long-term system behavior
+
+CPU Nodes
+
+Range: 1 - 10
+
+Meaning: Number of CPU servers
+
+Effect:
+
+Increase → Higher CPU capacity, shorter CPU queue, higher throughput, higher cost
+
+Decrease → Lower CPU capacity, longer CPU queue, potential bottleneck
+
+GPU Nodes
+
+Range: 1 - 5
+
+Similar to CPU nodes, consider GPU proportion and cost
+
+CPU Task Probability
+
+Range: 0.0 - 1.0
+
+Meaning: Probability a new task is CPU task
+
+Effect:
+
+High → CPU queue pressure, possible idle GPU
+
+Low → GPU queue pressure, possible idle CPU
+
+Database Connection and Functions
+
+Database Status
+
+✅ Connected / ❌ Not Connected
+
+Test Button: Test MariaDB connection
+
+Successful → Green label, usable database functions
+
+Failure → Red label, error popup, database functions unavailable
+
+Database Functions:
+
+💾 Save Config
+
+📁 Load Config
+
+📊 View History
+
+🎮 Control Buttons
+
+▶️ Start, ⏸ Pause, ▶️ Resume, ⏹ Stop, 🔄 Reset
+
+🚀 Speed Control: 0.1x - 100x
+
+📝 Basic Usage Flow
+
+1. Configure parameters
+
+2. Start simulation
+
+3. Control simulation
+
+4. Analyze results
+
+5. Optimize configuration
+
+6. Save results (optional)
+
+💡 Tips
+
+Quick test: Short Simulation Time, higher Speed
+
+Detailed analysis: Longer Simulation Time, normal Speed
+
+Identify bottlenecks, optimize one parameter at a time, save and compare configurations
+
+⚠️ Common Issues
+
+No data: Start simulation first
+
+Database failure: Check database.properties and MariaDB service
+
+Slow simulation: Increase Speed or reduce Simulation Time
+
+Performance evaluation: Avg System Time small is good, Throughput large is good
+
+Reasonable utilization: 30%-90%
+
+🎯 Next Step
+
+Check SCENARIO_GUIDE.md for application scenarios and case studies
