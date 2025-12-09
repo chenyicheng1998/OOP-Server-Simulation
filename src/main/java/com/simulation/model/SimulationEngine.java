@@ -1,5 +1,36 @@
 package com.simulation.model;
 import com.simulation.util.RandomGenerator;
+
+/**
+ * Core discrete-event simulation engine for cloud computing service queue simulation.
+ * 
+ * <p>This class extends {@link Thread} and implements a discrete-event simulation (DES)
+ * engine that models a cloud computing service provider. The simulation processes tasks
+ * through a series of service points:
+ * <ol>
+ *   <li>Data Storage</li>
+ *   <li>Classification</li>
+ *   <li>CPU/GPU Queue</li>
+ *   <li>CPU/GPU Compute</li>
+ *   <li>Result Storage</li>
+ * </ol>
+ * 
+ * <p>The engine uses an event-driven approach where events are scheduled and processed
+ * in chronological order. Tasks flow through the system based on their type (CPU/GPU)
+ * and user priority (Normal/Personal VIP/Enterprise VIP).
+ * 
+ * <p>Thread Safety: This class is thread-safe for concurrent access from UI thread.
+ * The simulation runs in its own thread and uses synchronized methods in ServicePoint
+ * and SimulationResults for thread-safe data access.
+ * 
+ * @author Cloud Simulation Team
+ * @version 2.0
+ * @see SimulationConfig
+ * @see SimulationResults
+ * @see ServicePoint
+ * @see Task
+ * @see Event
+ */
 public class SimulationEngine extends Thread {
     private final SimulationConfig config;
     private final SimulationResults results;
@@ -11,15 +42,40 @@ public class SimulationEngine extends Thread {
     private final Object pauseLock = new Object();
     private SimulationListener listener;
     /**
-     * Listener interface for simulation events
+     * Listener interface for simulation events.
+     * 
+     * <p>Implementations of this interface receive notifications when simulation
+     * time updates or when the simulation completes. Used to update UI components
+     * in real-time during simulation execution.
+     * 
+     * @since 2.0
      */
     public interface SimulationListener {
+        /**
+         * Called when simulation time advances.
+         * 
+         * @param time the current simulation time
+         */
         void onTimeUpdate(double time);
+        
+        /**
+         * Called when simulation completes normally or is stopped.
+         */
         void onSimulationComplete();
+        
+        /**
+         * Default implementation that calls onTimeUpdate with current clock time.
+         */
         default void onSimulationUpdate() {
             onTimeUpdate(Clock.getInstance().getTime());
         }
     }
+    /**
+     * Constructs a new SimulationEngine with the given configuration.
+     * 
+     * @param config the simulation configuration parameters
+     * @throws NullPointerException if config is null
+     */
     public SimulationEngine(SimulationConfig config) {
         this.config = config;
         this.results = new SimulationResults();
@@ -36,12 +92,35 @@ public class SimulationEngine extends Thread {
         gpuCompute = new ServicePoint("GPU Compute", config.getNumGpuNodes(), config.getGpuComputeServiceTime(), false);
         resultStorage = new ServicePoint("Result Storage", 1, config.getResultStorageServiceTime(), false);
     }
+    /**
+     * Sets the listener for simulation events.
+     * 
+     * @param listener the listener to receive simulation updates, or null to remove listener
+     */
     public void setListener(SimulationListener listener) {
         this.listener = listener;
     }
+    
+    /**
+     * Sets the simulation speed multiplier.
+     * 
+     * <p>The speed multiplier controls how fast simulation time advances relative
+     * to real time. A value of 1.0 means 1 simulation second = 1 real second.
+     * A value of 2.0 means simulation runs twice as fast.
+     * 
+     * @param speed the speed multiplier (clamped between 0.1 and 100.0)
+     */
     public void setSpeed(double speed) {
         this.speedMultiplier = Math.max(0.1, Math.min(100.0, speed));
     }
+    
+    /**
+     * Initializes the simulation engine.
+     * 
+     * <p>This method resets the clock, clears all events, resets statistics,
+     * and schedules the first arrival event. Must be called before starting
+     * the simulation.
+     */
     public void initialize() {
         clock.reset();
         eventList.clear();
@@ -220,18 +299,38 @@ public class SimulationEngine extends Thread {
         results.recordCompletion(task);
         if (resultStorage.isAvailable() && !resultStorage.isQueueEmpty()) startServiceResultStorage();
     }
+    /**
+     * Checks if the simulation is currently running.
+     * 
+     * @return true if simulation is running, false otherwise
+     */
     public boolean isRunning() {
         return running;
     }
 
+    /**
+     * Checks if the simulation is currently paused.
+     * 
+     * @return true if simulation is paused, false otherwise
+     */
     public boolean isPaused() {
         return paused;
     }
 
+    /**
+     * Pauses the simulation execution.
+     * 
+     * <p>The simulation thread will wait until {@link #resumeSimulation()} is called.
+     */
     public void pauseSimulation() {
         paused = true;
     }
 
+    /**
+     * Resumes a paused simulation.
+     * 
+     * <p>This method wakes up the simulation thread if it's waiting due to pause.
+     */
     public void resumeSimulation() {
         synchronized (pauseLock) {
             paused = false;
@@ -239,6 +338,12 @@ public class SimulationEngine extends Thread {
         }
     }
 
+    /**
+     * Stops the simulation execution.
+     * 
+     * <p>The simulation will finish processing the current event and then stop.
+     * The thread will exit after completing current operations.
+     */
     public void stopSimulation() {
         running = false;
         synchronized (pauseLock) {
@@ -246,6 +351,12 @@ public class SimulationEngine extends Thread {
         }
     }
 
+    /**
+     * Executes a single simulation step when paused.
+     * 
+     * <p>This method processes the next event in the queue. Only works when
+     * simulation is paused. Useful for debugging or step-by-step execution.
+     */
     public void stepForward() {
         if (paused && eventList.hasEvents()) {
             Event event = eventList.getNextEvent();
@@ -257,12 +368,47 @@ public class SimulationEngine extends Thread {
         }
     }
 
+    /**
+     * Gets the simulation results.
+     * 
+     * @return the SimulationResults object containing all statistics
+     */
     public SimulationResults getResults() {
         return results;
     }
+    
+    /**
+     * Gets the Data Storage service point.
+     * 
+     * @return the Data Storage ServicePoint
+     */
     public ServicePoint getDataStorage() { return dataStorage; }
+    
+    /**
+     * Gets the Classification service point.
+     * 
+     * @return the Classification ServicePoint
+     */
     public ServicePoint getClassification() { return classification; }
+    
+    /**
+     * Gets the CPU Compute service point.
+     * 
+     * @return the CPU Compute ServicePoint
+     */
     public ServicePoint getCpuCompute() { return cpuCompute; }
+    
+    /**
+     * Gets the GPU Compute service point.
+     * 
+     * @return the GPU Compute ServicePoint
+     */
     public ServicePoint getGpuCompute() { return gpuCompute; }
+    
+    /**
+     * Gets the Result Storage service point.
+     * 
+     * @return the Result Storage ServicePoint
+     */
     public ServicePoint getResultStorage() { return resultStorage; }
 }

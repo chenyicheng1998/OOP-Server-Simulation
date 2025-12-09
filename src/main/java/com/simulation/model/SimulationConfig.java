@@ -1,4 +1,23 @@
 package com.simulation.model;
+
+/**
+ * Configuration parameters for the simulation.
+ * 
+ * <p>This class holds all configurable parameters for the simulation, including:
+ * <ul>
+ *   <li>Service times for each service point</li>
+ *   <li>Number of CPU and GPU compute nodes</li>
+ *   <li>Task arrival rate and probabilities</li>
+ *   <li>User type distribution</li>
+ *   <li>Simulation duration</li>
+ * </ul>
+ * 
+ * <p>All parameters have default values and can be modified through setter methods.
+ * 
+ * @author Cloud Simulation Team
+ * @version 2.0
+ * @see SimulationEngine
+ */
 public class SimulationConfig {
     private double meanArrivalInterval = 1.0;
     private double dataStorageServiceTime = 1.0;
@@ -13,7 +32,18 @@ public class SimulationConfig {
     private double personalVipProbability = 0.3;
     private double simulationTime = 1000.0;
     private double speedMultiplier = 1.0;
+    /**
+     * Gets the mean arrival interval between tasks (in seconds).
+     * 
+     * @return the mean arrival interval
+     */
     public double getMeanArrivalInterval() { return meanArrivalInterval; }
+    
+    /**
+     * Sets the mean arrival interval between tasks.
+     * 
+     * @param v the mean arrival interval in seconds (must be positive)
+     */
     public void setMeanArrivalInterval(double v) { this.meanArrivalInterval = v; }
     public double getDataStorageServiceTime() { return dataStorageServiceTime; }
     public void setDataStorageServiceTime(double v) { this.dataStorageServiceTime = v; }
@@ -39,7 +69,23 @@ public class SimulationConfig {
     public void setSimulationTime(double v) { this.simulationTime = v; }
     public double getSpeedMultiplier() { return speedMultiplier; }
     public void setSpeedMultiplier(double v) { this.speedMultiplier = v; }
+    /**
+     * Gets the Enterprise VIP user probability.
+     * 
+     * <p>This is calculated as: 1.0 - normalUserProbability - personalVipProbability
+     * to ensure probabilities sum to 1.0.
+     * 
+     * @return the Enterprise VIP probability
+     */
     public double getEnterpriseVipProbability() { return 1.0 - normalUserProbability - personalVipProbability; }
+    
+    /**
+     * Sets the Enterprise VIP user probability.
+     * 
+     * <p>This method adjusts normalUserProbability to maintain total probability = 1.0.
+     * 
+     * @param v the Enterprise VIP probability (0.0 to 1.0)
+     */
     public void setEnterpriseVipProbability(double v) {
         // Adjust normalUserProbability to maintain total probability = 1.0
         // Keep personalVipProbability unchanged if possible
