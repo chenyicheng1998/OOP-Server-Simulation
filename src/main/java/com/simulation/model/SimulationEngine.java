@@ -84,13 +84,13 @@ public class SimulationEngine extends Thread {
         initializeServicePoints();
     }
     private void initializeServicePoints() {
-        dataStorage = new ServicePoint("Data Storage", 1, config.getDataStorageServiceTime(), false);
-        classification = new ServicePoint("Classification", 1, config.getClassificationServiceTime(), false);
+        dataStorage = new ServicePoint("Data Storage", 1, config.getDataStorageServiceTime(), true);
+        classification = new ServicePoint("Classification", 1, config.getClassificationServiceTime(), true);
         cpuQueue = new ServicePoint("CPU Queue", Integer.MAX_VALUE, 0, true);
         gpuQueue = new ServicePoint("GPU Queue", Integer.MAX_VALUE, 0, true);
-        cpuCompute = new ServicePoint("CPU Compute", config.getNumCpuNodes(), config.getCpuComputeServiceTime(), false);
-        gpuCompute = new ServicePoint("GPU Compute", config.getNumGpuNodes(), config.getGpuComputeServiceTime(), false);
-        resultStorage = new ServicePoint("Result Storage", 1, config.getResultStorageServiceTime(), false);
+        cpuCompute = new ServicePoint("CPU Compute", config.getNumCpuNodes(), config.getCpuComputeServiceTime(), true);
+        gpuCompute = new ServicePoint("GPU Compute", config.getNumGpuNodes(), config.getGpuComputeServiceTime(), true);
+        resultStorage = new ServicePoint("Result Storage", 1, config.getResultStorageServiceTime(), true);
     }
     /**
      * Sets the listener for simulation events.
