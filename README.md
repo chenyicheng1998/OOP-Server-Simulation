@@ -1,219 +1,305 @@
-# 云计算服务排队模拟系统
+# Cloud Computing Service Queue Simulation System
 
-## 项目简介
-这是一个基于Java和JavaFX的离散事件模拟系统，模拟云计算服务提供商的任务处理流程。
+## Overview
+A discrete event simulation system for cloud computing service queues, built with JavaFX 20.0.1, FXML, Scene Builder, and MariaDB database integration.
 
-## 系统特性
-- **三类用户**：普通用户、个人VIP、企业VIP（不同优先级）
-- **两种任务类型**：CPU任务和GPU任务  
-- **服务流程**：任务到达 → 数据存储 → 分类 → 排队(CPU/GPU) → 计算节点执行 → 结果存储 → 返回用户
-- **MVC架构**：Model-View-Controller设计模式
-- **可视化界面**：实时显示系统状态和统计数据
-- **可配置参数**：到达率、服务时间、资源数量等
+## System Architecture
 
-## 项目结构
+### User Types (Priority-based)
+1. **Enterprise VIP** - Highest priority
+2. **Personal VIP** - Medium priority  
+3. **Normal User** - Lowest priority
+
+### Task Types
+- **CPU Tasks** (70% probability by default)
+- **GPU Tasks** (30% probability by default)
+
+### Service Flow
 ```
-src/main/java/com/simulation/
-├── model/                      # 模型层
-│   ├── EventType.java         # 事件类型枚举
-│   ├── TaskType.java          # 任务类型枚举  
-│   ├── UserType.java          # 用户类型枚举
-│   ├── Task.java              # 任务类
-│   ├── Event.java             # 事件类
-│   ├── EventList.java         # 事件列表
-│   ├── Clock.java             # 仿真时钟(单例)
-│   ├── ServicePoint.java      # 服务点类
-│   ├── SimulationConfig.java  # 配置类
-│   ├── SimulationResults.java # 结果统计类
-│   └── SimulationEngine.java  # 仿真引擎(线程)
-├── controller/                 # 控制层
-│   └── SimulationController.java
-├── view/                       # 视图层
-│   └── SimulationView.java
-├── util/                       # 工具类
-│   └── RandomGenerator.java
-└── SimulatorApp.java          # 主程序入口
+Task Arrival → Data Storage → Classification → CPU/GPU Queue → 
+Compute Nodes → Result Storage → Task Complete
 ```
 
-## 技术栈
+### Service Points
+1. **Data Storage** - Initial data storage service
+2. **Classification** - Task type classification (CPU/GPU)
+3. **CPU Queue** - Priority queue for CPU tasks
+4. **GPU Queue** - Priority queue for GPU tasks
+5. **CPU Compute** - CPU computation nodes (configurable count)
+6. **GPU Compute** - GPU computation nodes (configurable count)
+7. **Result Storage** - Final result storage service
+
+## Technology Stack
+
 - **Java 17+**
 - **Maven 3.6+**
 - **JavaFX 20.0.1** (Controls, FXML, Graphics)
-- **MariaDB** + JDBC Driver
-- **HikariCP** - 数据库连接池
-- **Scene Builder** - FXML可视化设计工具
+- **MariaDB** with JDBC Driver
+- **HikariCP** - Connection pool management
+- **Scene Builder** - Visual FXML editor
 
-## 前置要求
-1. **JDK 17** 或更高版本
+## Prerequisites
+
+1. **JDK 17** or higher
 2. **Maven 3.6+**
-3. **MariaDB** 数据库服务器
-4. **HeidiSQL** 或其他数据库管理工具（推荐）
-5. **Scene Builder** (可选，用于UI设计)
+3. **MariaDB** database server
+4. **HeidiSQL** or similar DB tool (recommended)
+5. **Scene Builder** (optional, for UI editing)
 
-## 快速开始
+## Quick Start
 
-### 1. 设置数据库
+### 1. Setup Database
+
+Using HeidiSQL or command line:
 ```bash
-# 在MariaDB中执行SQL脚本
 mysql -u root -p < src/main/resources/database_schema.sql
 ```
-或者使用HeidiSQL打开 `src/main/resources/database_schema.sql` 并执行。
 
-详细步骤请参考：[DATABASE_SETUP.md](DATABASE_SETUP.md)
+See detailed instructions: [DATABASE_SETUP.md](DATABASE_SETUP.md)
 
-### 2. 配置数据库连接
-编辑 `src/main/resources/database.properties`：
+### 2. Configure Database Connection
+
+Edit `src/main/resources/database.properties`:
 ```properties
 db.url=jdbc:mariadb://localhost:3306/cloud_simulation
 db.username=root
-db.password=你的密码
+db.password=your_password
 ```
 
-### 3. 编译和运行
+### 3. Compile and Run
+
 ```bash
-# 清理并编译
+# Clean and compile
 mvn clean compile
 
-# 运行应用
+# Run application
 mvn javafx:run
 ```
 
-## 配置参数（可在GUI中调整）
-- 平均到达间隔：2.0秒（指数分布）
-- CPU计算节点数：2个
-- GPU计算节点数：1个
-- 仿真时间：1000秒
-- 任务类型分布：70% CPU, 30% GPU
-- 用户类型分布：60%普通，30%个人VIP，10%企业VIP
+## Features
 
-## 主要功能
+### 1. User Interface (JavaFX + FXML)
+- ✅ Real-time simulation visualization
+- ✅ Dynamic statistics display
+- ✅ Adjustable simulation speed (0.1x - 10x)
+- ✅ Pause/Resume/Step-through execution
+- ✅ Designed with Scene Builder
 
-### 1. 可视化界面 (JavaFX + FXML)
-- ✅ 实时仿真动画
-- ✅ 动态统计信息显示
-- ✅ 可调节的仿真速度（0.1x - 10x）
-- ✅ 暂停/继续/单步执行
-- ✅ 使用Scene Builder可视化设计
+### 2. Database Integration (MariaDB)
+- ✅ Save and load simulation configurations
+- ✅ Record all simulation runs
+- ✅ Store detailed task data
+- ✅ Statistical analysis (by user type, task type, service point)
+- ✅ Historical record queries
+- ✅ HikariCP connection pool
 
-### 2. 数据库集成 (MariaDB)
-- ✅ 保存和加载仿真配置
-- ✅ 记录所有仿真运行结果
-- ✅ 存储详细的任务数据
-- ✅ 统计分析（按用户类型、任务类型、服务点）
-- ✅ 历史记录查询
-- ✅ HikariCP连接池管理
+### 3. Simulation Features
+- ✅ Three-tier user priority scheduling
+- ✅ Two task types (CPU/GPU)
+- ✅ Multi-service-point workflow
+- ✅ Probabilistic arrival and service times
+- ✅ Real-time performance metrics
 
-### 3. 仿真功能
-- ✅ 三类用户优先级调度（企业VIP > 个人VIP > 普通用户）
-- ✅ 两种任务类型（CPU/GPU）
-- ✅ 多服务点流程（数据存储→分类→队列→计算→结果存储）
-- ✅ 基于概率的到达过程和服务时间
-- ✅ 实时性能指标计算
+## Core Simulation Algorithm
 
-## 核心算法
-### 离散事件仿真（Three-Phase Approach）
-1. **A阶段**：时钟前进到下一个事件时间
-2. **B阶段**：执行到期的事件（条件事件）
-3. **C阶段**：检查并启动可以开始的活动（绑定事件）
+### Discrete Event Simulation (Three-Phase Approach)
+1. **Phase A**: Advance clock to next event time
+2. **Phase B**: Execute due events (conditional events)
+3. **Phase C**: Start activities that can begin (bound events)
 
-### 优先级调度
-- 企业VIP > 个人VIP > 普通用户
-- 同等优先级按FIFO（先到先服务）
+### Priority Scheduling
+- Enterprise VIP > Personal VIP > Normal User
+- Same priority: FIFO (First-In-First-Out)
 
-## 性能指标
-- 平均系统时间
-- 吞吐量（任务/秒）
-- 队列长度统计
-- 服务点利用率
-- 按用户类型和任务类型的统计
+## Performance Metrics
 
-## 使用Scene Builder编辑UI
-详细说明请参考：[SCENE_BUILDER_GUIDE.md](SCENE_BUILDER_GUIDE.md)
+- **Average System Time** - Mean time tasks spend in system
+- **Throughput** - Tasks completed per second
+- **Queue Length Statistics** - Average and maximum queue lengths
+- **Service Point Utilization** - Percentage of time busy
+- **User Type Statistics** - Performance by user type
+- **Task Type Statistics** - Performance by task type
 
-1. 下载Scene Builder: https://gluonhq.com/products/scene-builder/
-2. 打开FXML文件: `src/main/resources/simulation_view.fxml`
-3. 可视化编辑界面布局
-4. 所有修改会自动反映到应用中
+## Editing UI with Scene Builder
 
-## 文档生成
+See detailed guide: [SCENE_BUILDER_GUIDE.md](SCENE_BUILDER_GUIDE.md)
+
+1. Download Scene Builder: https://gluonhq.com/products/scene-builder/
+2. Open FXML file: `src/main/resources/simulation_view.fxml`
+3. Visually edit interface layout
+4. Changes automatically reflect in application
+
+## Project Structure
+
+```
+src/main/
+├── java/com/simulation/
+│   ├── SimulatorApp.java              # Application entry point
+│   ├── controller/
+│   │   └── SimulationController.java  # FXML controller (handles UI events)
+│   ├── model/                         # Business logic layer
+│   │   ├── Clock.java                 # Singleton clock
+│   │   ├── Event.java                 # Event representation
+│   │   ├── EventList.java             # Event queue (priority queue)
+│   │   ├── EventType.java             # Event types enum
+│   │   ├── ServicePoint.java          # Service point with queue
+│   │   ├── SimulationConfig.java      # Configuration parameters
+│   │   ├── SimulationEngine.java      # Main simulation engine (Thread)
+│   │   ├── SimulationResults.java     # Results collector
+│   │   ├── Task.java                  # Task entity
+│   │   ├── TaskType.java              # CPU/GPU enum
+│   │   └── UserType.java              # User priority enum
+│   ├── database/                      # Database access layer
+│   │   ├── DatabaseManager.java       # Connection pool manager
+│   │   ├── SimulationConfigDAO.java   # Config CRUD operations
+│   │   └── SimulationResultsDAO.java  # Results CRUD operations
+│   ├── util/
+│   │   └── RandomGenerator.java       # Random number generators
+│   └── view/                          # Legacy view (deprecated)
+└── resources/
+    ├── simulation_view.fxml           # UI layout (Scene Builder compatible)
+    ├── styles.css                     # CSS styling
+    ├── database.properties            # Database configuration
+    └── database_schema.sql            # Database schema script
+```
+
+## Database Schema
+
+### Tables
+1. **simulation_configs** - Stores simulation configurations
+2. **simulation_runs** - Records each simulation run
+3. **tasks** - Detailed task records
+4. **service_point_stats** - Service point statistics
+5. **user_type_stats** - User type performance
+6. **task_type_stats** - Task type performance
+
+See [DATABASE_SETUP.md](DATABASE_SETUP.md) for details.
+
+## Configuration Parameters
+
+### Arrival Parameters
+- **Mean Arrival Interval** - Average time between task arrivals (exponential distribution)
+
+### Simulation Parameters
+- **Simulation Time** - Total simulation duration (seconds)
+- **CPU Nodes** - Number of CPU compute nodes
+- **GPU Nodes** - Number of GPU compute nodes
+- **CPU Task Probability** - Probability a task is CPU type
+
+### User Distribution
+- **Normal User Probability** - Default: 0.6 (60%)
+- **Personal VIP Probability** - Default: 0.3 (30%)
+- **Enterprise VIP Probability** - Default: 0.1 (10%)
+
+### Service Times (Mean values for exponential distribution)
+- **Data Storage Service Time** - Default: 1.0s
+- **Classification Service Time** - Default: 0.5s
+- **CPU Compute Service Time** - Default: 5.0s
+- **GPU Compute Service Time** - Default: 8.0s
+- **Result Storage Service Time** - Default: 1.5s
+
+## Using the Application
+
+### Basic Operations
+1. **Start** - Begin simulation with current configuration
+2. **Pause** - Pause running simulation
+3. **Resume** - Continue paused simulation
+4. **Stop** - Stop and save results to database
+5. **Reset** - Clear and reinitialize simulation
+
+### Configuration Management
+- **Save Config** - Save current parameters to database
+- **Load Config** - Load previously saved configuration
+- **View History** - View past simulation runs (coming soon)
+
+### Real-time Monitoring
+- Monitor current simulation time
+- View task arrival and completion counts
+- Track average system time
+- Observe throughput rate
+- Check queue statistics
+
+### Database Connection
+- Green checkmark (✅): Connected
+- Red X (❌): Not connected
+- Click "Test" to verify connection
+
+## Generating Documentation
+
 ```bash
 mvn javadoc:javadoc
 ```
-生成的文档位于: `target/site/apidocs/`
+Generated docs in: `target/site/apidocs/`
 
-## 数据库管理
+## Database Management
 
-### 查看仿真历史
+### View Simulation History
 ```sql
 SELECT * FROM simulation_runs ORDER BY start_time DESC LIMIT 10;
 ```
 
-### 清空所有数据
+### Clear All Data
 ```sql
 DELETE FROM tasks;
 DELETE FROM simulation_runs;
 ```
 
-### 备份数据库
+### Backup Database
 ```bash
 mysqldump -u root -p cloud_simulation > backup.sql
 ```
 
-更多数据库操作请参考：[DATABASE_SETUP.md](DATABASE_SETUP.md)
+See [DATABASE_SETUP.md](DATABASE_SETUP.md) for more operations.
 
-## 项目结构说明
+## Extension Ideas
 
-```
-src/main/
-├── java/com/simulation/
-│   ├── SimulatorApp.java           # 应用入口（使用FXML加载）
-│   ├── controller/
-│   │   └── SimulationController.java  # FXML控制器（处理UI事件）
-│   ├── model/                      # 业务逻辑层
-│   ├── view/                       # 视图层（已废弃，使用FXML代替）
-│   ├── database/                   # 数据库访问层
-│   │   ├── DatabaseManager.java   # 连接池管理
-│   │   ├── SimulationConfigDAO.java   # 配置DAO
-│   │   └── SimulationResultsDAO.java  # 结果DAO
-│   └── util/                       # 工具类
-└── resources/
-    ├── simulation_view.fxml        # UI布局文件（可用Scene Builder编辑）
-    ├── styles.css                  # CSS样式
-    ├── database.properties         # 数据库配置
-    └── database_schema.sql         # 数据库建表脚本
-```
+### Visualization Enhancements
+- Add real-time charts (JavaFX Charts)
+- Task flow animation
+- Heat map for queue states
 
-## 扩展功能建议
+### Statistical Analysis
+- Export Excel reports
+- Multi-run comparison analysis
+- Parameter sensitivity analysis
 
-1. **可视化增强**
-   - 添加实时图表（JavaFX Charts）
-   - 任务流动动画
-   - 热力图显示队列状态
+### Advanced Features
+- Multi-scenario simulation
+- Real-time parameter tuning
+- Automatic optimization algorithms
 
-2. **统计分析**
-   - 导出Excel报告
-   - 多次运行对比分析
-   - 参数敏感性分析
+## Troubleshooting
 
-3. **高级功能**
-   - 多场景仿真
-   - 实时参数调整
-   - 自动优化算法
+### Q1: Database connection fails
+**A:** Check MariaDB service is running, verify credentials in `database.properties`
 
-## 常见问题
+### Q2: FXML loading fails
+**A:** Ensure `simulation_view.fxml` is in resources folder, controller path is correct
 
-### Q1: 数据库连接失败
-A: 检查MariaDB服务是否运行，配置文件是否正确，参考 [DATABASE_SETUP.md](DATABASE_SETUP.md)
+### Q3: Maven compilation errors
+**A:** Run `mvn clean install` to re-download dependencies
 
-### Q2: FXML加载失败
-A: 确保 `simulation_view.fxml` 在resources目录下，Controller类路径正确
+### Q4: Application won't start
+**A:** Check Java version (must be 17+), verify JavaFX dependencies
 
-### Q3: Maven编译错误
-A: 运行 `mvn clean install` 重新下载依赖
+## Learning Resources
 
-## 作者
-Cloud Simulation Team - Metropolia UAS
+- **JavaFX Documentation**: https://openjfx.io/
+- **Scene Builder**: https://gluonhq.com/products/scene-builder/
+- **FXML Guide**: https://docs.oracle.com/javafx/2/fxml_get_started/jfxpub-fxml_get_started.htm
+- **MariaDB**: https://mariadb.org/documentation/
 
-## 许可证
+## Development Team
+
+Cloud Simulation Team - Metropolia University of Applied Sciences
+
+## License
+
 Educational Use - Metropolia University of Applied Sciences
+
+---
+
+**Note:** This is an academic project for learning discrete event simulation, MVC architecture, JavaFX development, and database integration.
+
+For questions or issues, please refer to the documentation files or contact the development team.
 
