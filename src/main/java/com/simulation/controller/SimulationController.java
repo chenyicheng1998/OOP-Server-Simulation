@@ -554,12 +554,29 @@ public class SimulationController {
         // Add comparison
         sb.append("📊 Priority Effect:\n");
         double normalTime = avgSystemTimeByUser.getOrDefault(UserType.NORMAL, 0.0);
+        double personalVipTime = avgSystemTimeByUser.getOrDefault(UserType.PERSONAL_VIP, 0.0);
         double enterpriseTime = avgSystemTimeByUser.getOrDefault(UserType.ENTERPRISE_VIP, 0.0);
+
         if (normalTime > 0 && enterpriseTime > 0) {
             double improvement = ((normalTime - enterpriseTime) / normalTime) * 100;
-            sb.append(String.format("   Enterprise VIP is %.1f%% faster", improvement));
+            if (improvement > 0) {
+                sb.append(String.format("   Enterprise VIP is %.1f%% faster than Normal\n", improvement));
+            } else {
+                sb.append(String.format("   Enterprise VIP is %.1f%% slower than Normal\n", -improvement));
+                sb.append("   (May occur with small samples or low load)\n");
+            }
         } else {
-            sb.append("   Insufficient data");
+            sb.append("   Insufficient data for comparison\n");
+        }
+
+        // Add Personal VIP comparison
+        if (normalTime > 0 && personalVipTime > 0) {
+            double personalImprovement = ((normalTime - personalVipTime) / normalTime) * 100;
+            if (personalImprovement > 0) {
+                sb.append(String.format("   Personal VIP is %.1f%% faster than Normal", personalImprovement));
+            } else {
+                sb.append(String.format("   Personal VIP is %.1f%% slower than Normal", -personalImprovement));
+            }
         }
 
         userTypeStatsLabel.setText(sb.toString());
