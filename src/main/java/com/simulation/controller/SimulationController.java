@@ -449,7 +449,9 @@ public class SimulationController {
         arrivedTasksLabel.setText(String.valueOf(results.getTotalArrivedTasks()));
         completedTasksLabel.setText(String.valueOf(results.getTotalCompletedTasks()));
         avgSystemTimeLabel.setText(String.format("%.2fs", results.getAverageSystemTime()));
-        throughputLabel.setText(String.format("%.3f/s", results.getThroughput()));
+        // Use current clock time for real-time throughput calculation
+        double currentTime = Clock.getInstance().getTime();
+        throughputLabel.setText(String.format("%.3f/s", results.getThroughput(currentTime)));
 
         // Update queue stats
         updateQueueStatistics();
