@@ -10,7 +10,6 @@ import com.simulation.util.RandomGenerator;
  * <ol>
  *   <li>Data Storage</li>
  *   <li>Classification</li>
- *   <li>CPU/GPU Queue</li>
  *   <li>CPU/GPU Compute</li>
  *   <li>Result Storage</li>
  * </ol>
