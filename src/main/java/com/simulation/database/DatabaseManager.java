@@ -10,8 +10,39 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Database connection manager using HikariCP connection pool
- * Singleton pattern to ensure only one connection pool exists
+ * Database connection manager using HikariCP connection pooling.
+ *
+ * <p>This class implements the Singleton pattern to ensure only one connection pool
+ * exists throughout the application lifecycle. It provides thread-safe database
+ * connections using HikariCP, a high-performance JDBC connection pool.
+ *
+ * <p>Configuration is loaded from {@code database.properties} file in the classpath,
+ * which should contain the following properties:
+ * <pre>
+ * db.url=jdbc:mariadb://localhost:3306/simulation_db
+ * db.username=root
+ * db.password=yourpassword
+ * db.driver=org.mariadb.jdbc.Driver
+ * </pre>
+ *
+ * <p>Graceful Degradation: If database connection fails (e.g., MariaDB server not running),
+ * the application continues to function without database features. Error messages are
+ * logged to stderr.
+ *
+ * <p>Connection Pool Configuration:
+ * <ul>
+ *   <li>Maximum Pool Size: 10 connections</li>
+ *   <li>Minimum Idle: 2 connections</li>
+ *   <li>Connection Timeout: 30 seconds</li>
+ *   <li>Idle Timeout: 600 seconds (10 minutes)</li>
+ *   <li>Max Lifetime: 1800 seconds (30 minutes)</li>
+ * </ul>
+ *
+ * @author Cloud Simulation Team
+ * @version 2.0
+ * @see HikariDataSource
+ * @see SimulationConfigDAO
+ * @see SimulationResultsDAO
  */
 public class DatabaseManager {
     private static DatabaseManager instance;

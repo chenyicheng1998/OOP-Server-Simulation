@@ -16,7 +16,42 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 /**
- * Main JavaFX view for the simulation
+ * Main JavaFX view component for the cloud computing simulation application.
+ *
+ * <p>This class is responsible for constructing and managing the entire user interface,
+ * including:
+ * <ul>
+ *   <li>Top control panel with simulation time display and speed control slider</li>
+ *   <li>Configuration input panel for simulation parameters (arrival rate, nodes, etc.)</li>
+ *   <li>Control buttons (Start, Pause, Resume, Stop, Reset)</li>
+ *   <li>Canvas for real-time system visualization showing service points and queues</li>
+ *   <li>Statistics display area showing real-time metrics and performance data</li>
+ *   <li>History log area with scrollable text output</li>
+ *   <li>Database status indicator and control buttons (Save/Load)</li>
+ * </ul>
+ *
+ * <p>The view is built programmatically using JavaFX layouts ({@link BorderPane},
+ * {@link VBox}, {@link HBox}, {@link GridPane}) and styled using an external CSS file
+ * ({@code styles.css}).
+ *
+ * <p>Layout Structure:
+ * <pre>
+ * BorderPane (root)
+ * ├── Top: Time display and speed control
+ * ├── Center: Canvas for visualization
+ * ├── Right: Statistics panel
+ * ├── Bottom: History log with scroll
+ * └── Left: Configuration inputs and control buttons
+ * </pre>
+ *
+ * <p>This class delegates all event handling and business logic to {@link SimulationController}.
+ *
+ * @author Cloud Simulation Team
+ * @version 2.0
+ * @see SimulationController
+ * @see Canvas
+ * @see Stage
+ * @see Scene
  */
 public class SimulationView {
     private final SimulationController controller;

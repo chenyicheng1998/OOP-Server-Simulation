@@ -18,8 +18,30 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * FXML Controller that mediates between View and Model
- * Handles UI events and database operations
+ * FXML Controller that mediates between the View (UI) and Model (simulation engine).
+ *
+ * <p>This controller follows the MVC (Model-View-Controller) design pattern and is responsible for:
+ * <ul>
+ *   <li>Handling all UI events (button clicks, slider changes, input validation)</li>
+ *   <li>Managing the lifecycle of the simulation engine (start, pause, resume, stop, reset)</li>
+ *   <li>Updating UI components with real-time simulation data</li>
+ *   <li>Coordinating database operations (save/load configurations and results)</li>
+ *   <li>Rendering visualization of the simulation system on canvas</li>
+ * </ul>
+ *
+ * <p>The controller implements {@link SimulationEngine.SimulationListener} to receive
+ * callbacks from the simulation thread and update the UI accordingly using JavaFX's
+ * {@link Platform#runLater(Runnable)} for thread-safe UI updates.
+ *
+ * <p>UI Update Throttling: To prevent performance issues during fast simulations,
+ * UI updates are throttled to occur at most every {@code UPDATE_INTERVAL_MS} milliseconds.
+ *
+ * @author Cloud Simulation Team
+ * @version 2.0
+ * @see SimulationEngine
+ * @see SimulationConfig
+ * @see SimulationResults
+ * @see SimulationView
  */
 public class SimulationController {
     // FXML Components

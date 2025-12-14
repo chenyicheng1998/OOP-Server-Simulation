@@ -7,8 +7,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for SimulationConfig
- * Handles CRUD operations for simulation configurations
+ * Data Access Object (DAO) for {@link SimulationConfig}.
+ *
+ * <p>This class provides CRUD (Create, Read, Update, Delete) operations for
+ * simulation configuration data stored in the MariaDB database. It abstracts
+ * all SQL operations and provides a clean Java API for configuration persistence.
+ *
+ * <p>Database Table: {@code simulation_configs}
+ *
+ * <p>Usage Example:
+ * <pre>
+ * SimulationConfigDAO dao = new SimulationConfigDAO();
+ * SimulationConfig config = new SimulationConfig();
+ * int configId = dao.saveConfig(config, "My Configuration");
+ * </pre>
+ *
+ * @author Cloud Simulation Team
+ * @version 2.0
+ * @see SimulationConfig
+ * @see DatabaseManager
  */
 public class SimulationConfigDAO {
     private final DatabaseManager dbManager;
@@ -18,7 +35,16 @@ public class SimulationConfigDAO {
     }
 
     /**
-     * Save a new configuration to the database
+     * Saves a new simulation configuration to the database.
+     *
+     * <p>This method inserts a new row into the {@code simulation_configs} table
+     * with all configuration parameters. The database auto-generates a unique
+     * {@code config_id} for the new configuration.
+     *
+     * @param config the simulation configuration to save
+     * @param configName a descriptive name for this configuration
+     * @return the auto-generated config_id, or -1 if save failed
+     * @throws SQLException if a database access error occurs
      */
     public int saveConfig(SimulationConfig config, String configName) throws SQLException {
         String sql = "INSERT INTO simulation_configs " +
@@ -59,7 +85,12 @@ public class SimulationConfigDAO {
     }
 
     /**
-     * Update an existing configuration
+     * Updates an existing simulation configuration in the database.
+     *
+     * @param configId the ID of the configuration to update
+     * @param config the new configuration data
+     * @return true if update was successful, false otherwise
+     * @throws SQLException if a database access error occurs
      */
     public boolean updateConfig(int configId, SimulationConfig config) throws SQLException {
         String sql = "UPDATE simulation_configs SET " +
@@ -93,7 +124,11 @@ public class SimulationConfigDAO {
     }
 
     /**
-     * Load configuration by ID
+     * Loads a simulation configuration from the database by its ID.
+     *
+     * @param configId the unique ID of the configuration to load
+     * @return the SimulationConfig object, or null if not found
+     * @throws SQLException if a database access error occurs
      */
     public SimulationConfig loadConfigById(int configId) throws SQLException {
         String sql = "SELECT * FROM simulation_configs WHERE config_id=?";
@@ -112,7 +147,11 @@ public class SimulationConfigDAO {
     }
 
     /**
-     * Load configuration by name
+     * Loads a simulation configuration from the database by its name.
+     *
+     * @param configName the name of the configuration to load
+     * @return the SimulationConfig object, or null if not found
+     * @throws SQLException if a database access error occurs
      */
     public SimulationConfig loadConfigByName(String configName) throws SQLException {
         String sql = "SELECT * FROM simulation_configs WHERE config_name=?";
@@ -131,7 +170,12 @@ public class SimulationConfigDAO {
     }
 
     /**
-     * Get all configuration names
+     * Retrieves all configuration names from the database.
+     *
+     * <p>Configurations are ordered by creation date (newest first).
+     *
+     * @return a list of configuration names
+     * @throws SQLException if a database access error occurs
      */
     public List<String> getAllConfigNames() throws SQLException {
         List<String> names = new ArrayList<>();
@@ -149,7 +193,11 @@ public class SimulationConfigDAO {
     }
 
     /**
-     * Delete configuration by ID
+     * Deletes a configuration from the database by its ID.
+     *
+     * @param configId the ID of the configuration to delete
+     * @return true if deletion was successful, false if no configuration found
+     * @throws SQLException if a database access error occurs
      */
     public boolean deleteConfig(int configId) throws SQLException {
         String sql = "DELETE FROM simulation_configs WHERE config_id=?";
@@ -163,7 +211,13 @@ public class SimulationConfigDAO {
     }
 
     /**
-     * Extract SimulationConfig from ResultSet
+     * Extracts a SimulationConfig object from a database ResultSet.
+     *
+     * <p>This helper method maps database columns to SimulationConfig properties.
+     *
+     * @param rs the ResultSet positioned at a valid row
+     * @return the extracted SimulationConfig object
+     * @throws SQLException if a database access error occurs
      */
     private SimulationConfig extractConfigFromResultSet(ResultSet rs) throws SQLException {
         SimulationConfig config = new SimulationConfig();

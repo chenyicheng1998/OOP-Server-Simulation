@@ -12,8 +12,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Data Access Object for Simulation Results
- * Handles saving simulation runs and task data to database
+ * Data Access Object (DAO) for {@link SimulationResults}.
+ *
+ * <p>This class provides database operations for persisting simulation run results,
+ * including:
+ * <ul>
+ *   <li>Creating new simulation run records</li>
+ *   <li>Updating run results with statistics</li>
+ *   <li>Saving individual task data</li>
+ *   <li>Querying historical simulation runs</li>
+ * </ul>
+ *
+ * <p>Database Tables:
+ * <ul>
+ *   <li>{@code simulation_runs}: Stores overall run metadata and statistics</li>
+ *   <li>{@code simulation_tasks}: Stores individual task details</li>
+ * </ul>
+ *
+ * @author Cloud Simulation Team
+ * @version 2.0
+ * @see SimulationResults
+ * @see DatabaseManager
  */
 public class SimulationResultsDAO {
     private final DatabaseManager dbManager;
@@ -23,8 +42,16 @@ public class SimulationResultsDAO {
     }
 
     /**
-     * Create a new simulation run record
-     * @return run_id of the created record
+     * Creates a new simulation run record in the database.
+     *
+     * <p>This method inserts a new row into the {@code simulation_runs} table
+     * with initial status 'RUNNING'. The run can be associated with a saved
+     * configuration by providing a configId, or can be standalone (configId = null).
+     *
+     * @param configId the ID of the associated configuration, or null if none
+     * @param runName a descriptive name for this simulation run
+     * @return the auto-generated run_id, or -1 if creation failed
+     * @throws SQLException if a database access error occurs
      */
     public int createSimulationRun(Integer configId, String runName) throws SQLException {
         String sql = "INSERT INTO simulation_runs (config_id, run_name, status) VALUES (?, ?, 'RUNNING')";
@@ -51,7 +78,17 @@ public class SimulationResultsDAO {
     }
 
     /**
-     * Update simulation run with final results
+     * Updates a simulation run with final results and statistics.
+     *
+     * <p>This method is called when the simulation completes. It updates the
+     * run record with final statistics including duration, task counts, average
+     * system time, throughput, and final status (COMPLETED or FAILED).
+     *
+     * @param runId the ID of the simulation run to update
+     * @param results the SimulationResults containing final statistics
+     * @param status the final status ('COMPLETED', 'FAILED', 'STOPPED')
+     * @return true if update was successful, false otherwise
+     * @throws SQLException if a database access error occurs
      */
     public boolean updateSimulationRun(int runId, SimulationResults results, String status) throws SQLException {
         String sql = "UPDATE simulation_runs SET " +
